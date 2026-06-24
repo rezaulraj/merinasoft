@@ -185,7 +185,7 @@ const HeroHome = () => {
 
           <h1
             ref={titleRef}
-            className="mx-auto max-w-4xl text-3xl font-extrabold leading-tight text-white drop-shadow-2xl sm:text-4xl md:text-5xl lg:text-6xl"
+            className="mx-auto max-w-4xl text-2xl font-extrabold leading-tight text-white drop-shadow-2xl sm:text-3xl md:text-4xl"
           >
             {currentSlide.title}
           </h1>
@@ -194,7 +194,7 @@ const HeroHome = () => {
             <>
               <h2
                 ref={(el) => (textRefs.current[0] = el)}
-                className="mx-auto mt-5 min-h-[48px] max-w-3xl text-2xl font-bold leading-tight text-white drop-shadow-xl sm:text-3xl md:text-4xl"
+                className="mx-auto mt-5 min-h-[48px] max-w-3xl text-xl font-bold leading-tight text-white drop-shadow-xl sm:text-2xl"
               >
                 {typeText}
                 <span className="ml-1 animate-pulse text-white">|</span>
@@ -202,7 +202,7 @@ const HeroHome = () => {
 
               <p
                 ref={(el) => (textRefs.current[1] = el)}
-                className="mx-auto mt-5 max-w-2xl text-sm font-medium leading-7 text-white/95 drop-shadow-lg sm:text-base md:text-lg"
+                className="mx-auto mt-5 max-w-2xl text-sm font-medium leading-7 text-white/95 drop-shadow-lg sm:text-base"
               >
                 {currentSlide.description}
               </p>
@@ -215,8 +215,8 @@ const HeroHome = () => {
                   ref={(el) => (textRefs.current[index] = el)}
                   className={`mx-auto max-w-3xl font-semibold leading-relaxed text-white drop-shadow-xl ${
                     index === 0
-                      ? "text-xl sm:text-2xl md:text-3xl lg:text-4xl"
-                      : "text-lg sm:text-xl md:text-2xl lg:text-3xl"
+                      ? "text-xl sm:text-2xl md:text-3xl"
+                      : "text-lg sm:text-xl md:text-2xl"
                   }`}
                 >
                   {line}
@@ -242,20 +242,6 @@ const HeroHome = () => {
       >
         ›
       </button>
-
-      <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-3">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setActiveSlide(index)}
-            className={`h-2.5 rounded-full transition-all duration-300 ${
-              activeSlide === index
-                ? "w-9 bg-white"
-                : "w-2.5 bg-white/50 hover:bg-white"
-            }`}
-          />
-        ))}
-      </div>
     </section>
   );
 };

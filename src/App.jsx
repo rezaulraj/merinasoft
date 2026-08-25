@@ -6,6 +6,11 @@ import Products from "./pages/products/Products";
 import Services from "./pages/services/Services";
 import Gallery from "./pages/gallery/Gallery";
 import Contact from "./pages/contact/Contact";
+import TermsAndConditions from "./components/common/TermsAndConditions";
+import PrivacyPolicy from "./components/common/PrivacyPolicy";
+import RefundPolicy from "./components/common/RefundPolicy";
+import CheckoutPage from "./components/common/CheckoutPage";
+import ProductSection from "./components/common/ProductSection";
 function App() {
   return (
     <>
@@ -18,6 +23,11 @@ function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/teams-conditions" element={<TermsAndConditions />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/refund-policy" element={<RefundPolicy />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            {/* <Route path="/products" element={<ProductSection />} /> */}
           </Route>
         </Routes>
       </Router>

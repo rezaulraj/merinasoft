@@ -1,10 +1,11 @@
 import React from "react";
 import logo from "/logo.png";
+import banner from "/payment-banner.png";
 
 const socialLinks = [
   {
     name: "Facebook",
-    href: "#",
+    href: "https://web.facebook.com/merinasoft/?_rdc=1&_rdr#",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
         <path d="M14 8.5V6.8c0-.8.5-1.3 1.4-1.3H17V2.3c-.8-.1-1.7-.2-2.5-.2-2.6 0-4.4 1.6-4.4 4.5v1.9H7.2V12h2.9v9.8H14V12h2.8l.5-3.5H14Z" />
@@ -32,7 +33,7 @@ const socialLinks = [
   },
   {
     name: "LinkedIn",
-    href: "#",
+    href: "https://www.linkedin.com/company/merinasoft?originalSubdomain=bd",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
         <path d="M6.5 8.8H3.2V21h3.3V8.8ZM4.9 3C3.8 3 3 3.8 3 4.8s.8 1.8 1.9 1.8 1.9-.8 1.9-1.8S5.9 3 4.9 3ZM21 14c0-3.2-1.7-5.4-4.6-5.4-1.8 0-2.9 1-3.4 1.9V8.8H9.7V21H13v-6.4c0-1.7.9-2.8 2.3-2.8 1.3 0 2.2.9 2.2 2.8V21H21v-7Z" />
@@ -41,13 +42,23 @@ const socialLinks = [
   },
   {
     name: "YouTube",
-    href: "#",
+    href: "https://www.youtube.com/channel/UCj6aOzaOSYC6YNUSgaxjN1A",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
         <path d="M21.6 7.2s-.2-1.5-.8-2.1c-.8-.8-1.7-.8-2.1-.9C15.8 4 12 4 12 4s-3.8 0-6.7.2c-.4.1-1.3.1-2.1.9-.6.6-.8 2.1-.8 2.1S2.2 9 2.2 10.8v1.7c0 1.8.2 3.6.2 3.6s.2 1.5.8 2.1c.8.8 1.9.8 2.4.9 1.7.2 6.4.2 6.4.2s3.8 0 6.7-.2c.4-.1 1.3-.1 2.1-.9.6-.6.8-2.1.8-2.1s.2-1.8.2-3.6v-1.7c0-1.8-.2-3.6-.2-3.6ZM10.2 14.9V8.8l5.7 3.1-5.7 3Z" />
       </svg>
     ),
   },
+];
+
+/* Header Navigation Links */
+const navLinks = [
+  { label: "Home", path: "/" },
+  { label: "About", path: "/about" },
+  { label: "Products", path: "/products" },
+  { label: "Services", path: "/services" },
+  { label: "Gallery", path: "/gallery" },
+  { label: "Contact", path: "/contact" },
 ];
 
 const industries = [
@@ -70,7 +81,6 @@ const services = [
 const contacts = [
   "Mob: +8801405700100 (Office)",
   "Mob: +8801704473813 (HR)",
-  "Mob: +8801686357311 (Marketing)",
   "merinasoftteam@gmail.com",
   "merinasof.official@gmail.com",
 ];
@@ -79,19 +89,20 @@ const Footer = () => {
   return (
     <footer className="relative overflow-hidden bg-[#160b56] font-arimo text-white">
       <div className="relative z-10 mx-auto container px-4 py-14">
-        {/* Top */}
+        {/* ================= TOP ================= */}
         <div className="mb-14 flex flex-col gap-8 border-b border-white/10 pb-10 md:flex-row md:items-center md:justify-between">
           <div>
-            <div className="flex items-center gap-3">
+            <a href="/" className="flex items-center gap-3">
               <img
                 src={logo}
-                alt="Merinasoft"
+                alt="Merinasoft Logo"
                 className="h-12 w-12 object-contain"
               />
+
               <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                 Merinasoft
               </h2>
-            </div>
+            </a>
 
             <p className="mt-4 max-w-xl text-sm font-medium leading-7 text-white/70 sm:text-base">
               Transforming ideas into powerful software, web, mobile, cloud, and
@@ -99,11 +110,14 @@ const Footer = () => {
             </p>
           </div>
 
+          {/* Social */}
           <div className="flex items-center gap-4">
-            {socialLinks.map((item, index) => (
+            {socialLinks.map((item) => (
               <a
-                key={index}
+                key={item.name}
                 href={item.href}
+                target={item.href !== "#" ? "_blank" : undefined}
+                rel={item.href !== "#" ? "noopener noreferrer" : undefined}
                 aria-label={item.name}
                 className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-gradient-to-br hover:from-[#3b1578] hover:via-[#a31180] hover:to-[#d10c74] hover:shadow-xl"
               >
@@ -115,14 +129,11 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Footer Columns */}
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        {/* ================= FOOTER COLUMNS ================= */}
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {/* Address */}
           <div>
-            <h3 className="relative mb-6 inline-block text-xl font-black">
-              Address
-              <span className="absolute -bottom-2 left-0 h-1 w-12 rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74]" />
-            </h3>
+            <FooterTitle title="Address" />
 
             <p className="max-w-xs text-base font-medium leading-8 text-white/75">
               2nd Floor, A&amp;A Tower, 173 Arambagh, Dhaka 1000
@@ -132,27 +143,48 @@ const Footer = () => {
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-white/50">
                 Office Time
               </p>
-              <p className="mt-2 text-base font-bold text-white">
-                Sat - Thu, 10:00 AM - 7:00 PM
+
+              <p className="mt-2 text-base font-bold text-white">Sat - Thu</p>
+
+              <p className="mt-1 text-sm font-medium text-white/70">
+                10:00 AM - 7:00 PM
               </p>
             </div>
           </div>
 
+          {/* Quick Links */}
+          <div>
+            <FooterTitle title="Quick Links" />
+
+            <ul className="space-y-3">
+              {navLinks.map((item) => (
+                <li key={item.path}>
+                  <a
+                    href={item.path}
+                    className="group inline-flex items-center gap-2 text-base font-semibold text-white/75 transition-all duration-300 hover:translate-x-1 hover:text-white"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#d10c74] transition-all duration-300 group-hover:w-4" />
+
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Industry */}
           <div>
-            <h3 className="relative mb-6 inline-block text-xl font-black">
-              Top Industry
-              <span className="absolute -bottom-2 left-0 h-1 w-12 rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74]" />
-            </h3>
+            <FooterTitle title="Top Industry" />
 
             <ul className="space-y-3">
               {industries.map((item, index) => (
                 <li key={index}>
                   <a
-                    href="#"
-                    className="group inline-flex items-center gap-2 text-base font-semibold text-white/75 transition-all duration-300 hover:text-white"
+                    href="/products"
+                    className="group inline-flex items-start gap-2 text-base font-semibold leading-6 text-white/75 transition-all duration-300 hover:translate-x-1 hover:text-white"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#d10c74] opacity-70 transition-all duration-300 group-hover:w-4" />
+                    <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#d10c74] transition-all duration-300 group-hover:w-4" />
+
                     {item}
                   </a>
                 </li>
@@ -162,19 +194,17 @@ const Footer = () => {
 
           {/* Services */}
           <div>
-            <h3 className="relative mb-6 inline-block text-xl font-black">
-              Top Services
-              <span className="absolute -bottom-2 left-0 h-1 w-12 rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74]" />
-            </h3>
+            <FooterTitle title="Top Services" />
 
             <ul className="space-y-3">
               {services.map((item, index) => (
                 <li key={index}>
                   <a
-                    href="#"
-                    className="group inline-flex items-center gap-2 text-base font-semibold text-white/75 transition-all duration-300 hover:text-white"
+                    href="/services"
+                    className="group inline-flex items-start gap-2 text-base font-semibold leading-6 text-white/75 transition-all duration-300 hover:translate-x-1 hover:text-white"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#a31180] opacity-70 transition-all duration-300 group-hover:w-4" />
+                    <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#a31180] transition-all duration-300 group-hover:w-4" />
+
                     {item}
                   </a>
                 </li>
@@ -184,46 +214,80 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h3 className="relative mb-6 inline-block text-xl font-black">
-              Get In Touch
-              <span className="absolute -bottom-2 left-0 h-1 w-12 rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74]" />
-            </h3>
+            <FooterTitle title="Get In Touch" />
 
             <ul className="space-y-3">
               {contacts.map((item, index) => (
                 <li
                   key={index}
-                  className="text-base font-semibold leading-7 text-white/75 transition-all duration-300 hover:text-white"
+                  className="break-words text-base font-semibold leading-7 text-white/75 transition-all duration-300 hover:text-white"
                 >
                   {item}
                 </li>
               ))}
             </ul>
+
+            <a
+              href="/contact"
+              className="mt-6 inline-flex items-center rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] px-5 py-2.5 text-sm font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+            >
+              Contact Us
+              <span className="ml-2">→</span>
+            </a>
           </div>
         </div>
 
-        {/* Bottom */}
-        <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-7 text-center text-sm font-semibold text-white/60 md:flex-row md:items-center md:justify-between md:text-left">
-          <p>© {new Date().getFullYear()} Merinasoft. All Rights Reserved.</p>
+        {/* ================= BOTTOM ================= */}
+        <div className="mt-14 border-t border-white/10 pt-7">
+          <div className="flex flex-col gap-4 text-center text-sm font-semibold text-white/60 md:flex-row md:items-center md:justify-between md:text-left">
+            <p>© {new Date().getFullYear()} Merinasoft. All Rights Reserved.</p>
 
-          <div className="flex justify-center gap-5">
-            <a
-              href="#"
-              className="transition-all duration-300 hover:text-white"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="#"
-              className="transition-all duration-300 hover:text-white"
-            >
-              Terms & Conditions
-            </a>
+            <div className="flex flex-wrap justify-center gap-x-5 gap-y-2">
+              <a
+                href="/privacy-policy"
+                className="transition-all duration-300 hover:text-white"
+              >
+                Privacy Policy
+              </a>
+
+              <a
+                href="/teams-conditions"
+                className="transition-all duration-300 hover:text-white"
+              >
+                Terms & Conditions
+              </a>
+
+              <a
+                href="/refund-policy"
+                className="transition-all duration-300 hover:text-white"
+              >
+                Refund Policy
+              </a>
+            </div>
+          </div>
+
+          {/* Payment Banner */}
+          <div className="mt-7 flex justify-center border-t border-white/10 pt-7">
+            <div className="w-full rounded-2xl bg-white p-3 shadow-lg sm:p-4">
+              <img
+                src={banner}
+                alt="Supported payment methods"
+                className="mx-auto h-auto w-full object-contain"
+              />
+            </div>
           </div>
         </div>
       </div>
     </footer>
   );
 };
+
+const FooterTitle = ({ title }) => (
+  <h3 className="relative mb-6 inline-block text-xl font-black">
+    {title}
+
+    <span className="absolute -bottom-2 left-0 h-1 w-12 rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74]" />
+  </h3>
+);
 
 export default Footer;

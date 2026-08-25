@@ -65,7 +65,9 @@ const AboutIcon = ({ type }) => {
           strokeWidth="2"
           strokeLinecap="round"
         />
+
         <circle cx="12" cy="7" r="3" stroke="currentColor" strokeWidth="2" />
+
         <path
           d="M4 21c1.5-4 4.2-6 8-6s6.5 2 8 6"
           stroke="currentColor"
@@ -115,6 +117,34 @@ const AboutIcon = ({ type }) => {
   );
 };
 
+const TradeLicenseIcon = () => {
+  return (
+    <svg
+      className="h-7 w-7"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M8 3h8l1 3h3v15H4V6h3l1-3Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="M8 11h8M8 15h5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+
+      <circle cx="17" cy="17" r="2" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+};
+
 const AboutBackground = () => {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -150,7 +180,9 @@ const AboutBackground = () => {
         <rect width="1440" height="1600" fill="url(#aboutGrid)" />
 
         <circle cx="120" cy="220" r="280" fill="#3b1578" opacity="0.12" />
+
         <circle cx="1280" cy="320" r="310" fill="#a31180" opacity="0.12" />
+
         <circle cx="720" cy="1380" r="360" fill="#d10c74" opacity="0.1" />
 
         <path
@@ -195,7 +227,9 @@ const AboutBackground = () => {
       </svg>
 
       <div className="absolute -left-40 top-24 h-96 w-96 rounded-full bg-[#3b1578]/20 blur-3xl" />
+
       <div className="absolute -right-40 top-44 h-[430px] w-[430px] rounded-full bg-[#a31180]/20 blur-3xl" />
+
       <div className="absolute bottom-10 left-1/2 h-[460px] w-[460px] -translate-x-1/2 rounded-full bg-[#d10c74]/20 blur-3xl" />
     </div>
   );
@@ -208,7 +242,10 @@ const AboutUs = () => {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         ".about-reveal",
-        { y: 60, opacity: 0 },
+        {
+          y: 60,
+          opacity: 0,
+        },
         {
           y: 0,
           opacity: 1,
@@ -224,7 +261,11 @@ const AboutUs = () => {
 
       gsap.fromTo(
         ".about-card",
-        { y: 70, opacity: 0, scale: 0.95 },
+        {
+          y: 70,
+          opacity: 0,
+          scale: 0.95,
+        },
         {
           y: 0,
           opacity: 1,
@@ -241,7 +282,11 @@ const AboutUs = () => {
 
       gsap.fromTo(
         ".value-card",
-        { y: 60, opacity: 0, rotateX: 12 },
+        {
+          y: 60,
+          opacity: 0,
+          rotateX: 12,
+        },
         {
           y: 0,
           opacity: 1,
@@ -302,11 +347,12 @@ const AboutUs = () => {
 
       <section className="relative z-10 px-6 pb-20 pt-28 sm:px-10 lg:px-20">
         <div className="mx-auto max-w-7xl">
-          {/* Hero */}
+
           <div className="grid items-center gap-12 lg:grid-cols-[0.95fr_1.05fr]">
             <div>
               <div className="about-reveal mb-5 inline-flex items-center gap-3 rounded-full border border-[#a31180]/15 bg-white/80 px-5 py-2 shadow-sm backdrop-blur-md">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#d10c74]" />
+
                 <span className="text-sm font-bold uppercase tracking-[0.25em] text-[#3b1578]">
                   About MerinaSoft
                 </span>
@@ -327,17 +373,22 @@ const AboutUs = () => {
               </p>
 
               <div className="about-reveal mt-9 flex flex-wrap gap-4">
-                <button className="rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] px-8 py-4 text-sm font-black uppercase tracking-wide text-white shadow-[0_18px_45px_rgba(163,17,128,0.30)] transition-all duration-300 hover:-translate-y-1">
+                <button
+                  type="button"
+                  className="rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] px-8 py-4 text-sm font-black uppercase tracking-wide text-white shadow-[0_18px_45px_rgba(163,17,128,0.30)] transition-all duration-300 hover:-translate-y-1"
+                >
                   Start a Project
                 </button>
 
-                <button className="rounded-full border border-[#a31180]/20 bg-white px-8 py-4 text-sm font-black uppercase tracking-wide text-[#3b1578] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-[#3b1578] hover:text-white">
+                <button
+                  type="button"
+                  className="rounded-full border border-[#a31180]/20 bg-white px-8 py-4 text-sm font-black uppercase tracking-wide text-[#3b1578] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-[#3b1578] hover:text-white"
+                >
                   Explore Services
                 </button>
               </div>
             </div>
 
-            {/* Image Collage */}
             <div className="about-reveal relative min-h-[560px]">
               <div className="absolute inset-0 rounded-[50px] bg-gradient-to-br from-[#3b1578]/20 via-[#a31180]/20 to-[#d10c74]/20 blur-2xl" />
 
@@ -355,10 +406,12 @@ const AboutUs = () => {
                   alt="Developer working"
                   className="h-[170px] w-full rounded-[24px] object-cover"
                 />
+
                 <div className="px-2 py-4">
                   <p className="text-sm font-black text-slate-950">
                     Agile Development
                   </p>
+
                   <p className="mt-1 text-xs font-semibold text-slate-500">
                     Transparent workflow
                   </p>
@@ -381,6 +434,7 @@ const AboutUs = () => {
 
                 <div className="mt-5 rounded-2xl bg-white/10 p-4">
                   <h4 className="text-3xl font-black text-white">7+</h4>
+
                   <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-white/50">
                     Years Experience
                   </p>
@@ -389,15 +443,16 @@ const AboutUs = () => {
             </div>
           </div>
 
-          {/* Core Cards */}
           <div className="about-card-area mt-20 grid gap-6 md:grid-cols-3">
             <div className="about-card rounded-[34px] border border-white bg-white/85 p-7 shadow-[0_25px_80px_rgba(59,21,120,0.08)] backdrop-blur-xl">
               <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-[#3b1578] text-white shadow-xl">
                 <AboutIcon type="team" />
               </div>
+
               <h3 className="text-2xl font-black text-slate-950">
                 Collaborative Team
               </h3>
+
               <p className="mt-4 text-base font-medium leading-8 text-slate-600">
                 Our company is built on collaboration and teamwork. We believe
                 the best results come from working together with open
@@ -409,9 +464,11 @@ const AboutUs = () => {
               <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-[#a31180] text-white shadow-xl">
                 <AboutIcon type="code" />
               </div>
+
               <h3 className="text-2xl font-black text-slate-950">
                 Smart Software
               </h3>
+
               <p className="mt-4 text-base font-medium leading-8 text-slate-600">
                 We create software that is powerful, reliable, user-friendly,
                 and tailored to meet each client’s specific business needs.
@@ -422,9 +479,11 @@ const AboutUs = () => {
               <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-[#d10c74] text-white shadow-xl">
                 <AboutIcon type="growth" />
               </div>
+
               <h3 className="text-2xl font-black text-slate-950">
                 Business Value
               </h3>
+
               <p className="mt-4 text-base font-medium leading-8 text-slate-600">
                 We believe our success is directly tied to our clients’ success,
                 so every solution is designed to create real business value.
@@ -432,7 +491,6 @@ const AboutUs = () => {
             </div>
           </div>
 
-          {/* Story Section */}
           <div className="mt-20 grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div className="about-card overflow-hidden rounded-[40px] border border-white bg-white/80 p-4 shadow-[0_35px_110px_rgba(59,21,120,0.12)] backdrop-blur-xl">
               <img
@@ -476,7 +534,6 @@ const AboutUs = () => {
             </div>
           </div>
 
-          {/* Values */}
           <div className="value-area mt-20">
             <div className="mx-auto mb-12 max-w-4xl text-center">
               <h2 className="about-card text-4xl font-black leading-tight text-slate-950 sm:text-5xl">
@@ -514,7 +571,6 @@ const AboutUs = () => {
             </div>
           </div>
 
-          {/* Industries */}
           <div className="about-card mt-20 rounded-[40px] bg-slate-950 p-8 shadow-[0_35px_110px_rgba(59,21,120,0.20)] sm:p-10">
             <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
               <div>
@@ -545,7 +601,65 @@ const AboutUs = () => {
             </div>
           </div>
 
-          {/* CTA */}
+          <div className="about-card mt-10 overflow-hidden rounded-[40px] border border-white bg-white/85 p-8 shadow-[0_25px_80px_rgba(59,21,120,0.10)] backdrop-blur-xl sm:p-10">
+            <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
+              {/* Left */}
+              <div className="flex items-start gap-5">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br from-[#3b1578] via-[#a31180] to-[#d10c74] text-white shadow-[0_15px_40px_rgba(163,17,128,0.25)]">
+                  <TradeLicenseIcon />
+                </div>
+
+                <div>
+                  <span className="text-xs font-black uppercase tracking-[0.25em] text-[#d10c74]">
+                    Business Registration
+                  </span>
+
+                  <h3 className="mt-2 text-2xl font-black text-slate-950 sm:text-3xl">
+                    Trade License
+                  </h3>
+
+                  <p className="mt-2 max-w-lg text-sm font-medium leading-6 text-slate-500">
+                    Official business trade license information for MerinaSoft.
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative overflow-hidden rounded-[28px] border border-[#a31180]/10 bg-gradient-to-r from-[#3b1578]/5 via-[#a31180]/5 to-[#d10c74]/5 px-6 py-5 sm:px-8">
+                <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#d10c74]/10 blur-xl" />
+
+                <p className="relative text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+                  License Number
+                </p>
+
+                <p className="relative mt-2 break-all text-lg font-black tracking-wide text-[#3b1578] sm:text-xl md:text-2xl">
+                  TRAD/DSCC/325400/2025
+                </p>
+
+                <div className="relative mt-4 flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100">
+                    <svg
+                      className="h-3.5 w-3.5 text-emerald-600"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="m5 12 4 4L19 6"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+
+                  <span className="text-xs font-bold text-emerald-600">
+                    Registered Business
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="about-card mt-10 overflow-hidden rounded-[40px] bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] p-[1px] shadow-[0_35px_110px_rgba(163,17,128,0.25)]">
             <div className="rounded-[39px] bg-white px-8 py-12 text-center sm:px-12">
               <h2 className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl">
@@ -557,8 +671,11 @@ const AboutUs = () => {
                 support software solutions that grow with your business.
               </p>
 
-              <button className="mt-8 rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] px-9 py-4 text-sm font-black uppercase tracking-wide text-white shadow-[0_18px_45px_rgba(163,17,128,0.30)] transition-all duration-300 hover:-translate-y-1">
-                Let’s Build Together
+              <button
+                type="button"
+                className="mt-8 rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] px-9 py-4 text-sm font-black uppercase tracking-wide text-white shadow-[0_18px_45px_rgba(163,17,128,0.30)] transition-all duration-300 hover:-translate-y-1"
+              >
+                Let&apos;s Build Together
               </button>
             </div>
           </div>

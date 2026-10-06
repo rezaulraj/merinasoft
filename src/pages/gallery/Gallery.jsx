@@ -1,6 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import { ArrowLeft, ArrowRight, Expand, X, MoveRight } from "lucide-react";
+import { getLenis } from "../../hooks/useSmoothScroll";
 
 import gallery1 from "../../assets/gallery1.jpg";
 import gallery2 from "../../assets/gallery2.jpg";
@@ -10,316 +15,390 @@ import gallery5 from "../../assets/gallery5.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const galleryImages = [
-  {
-    image: gallery1,
-    title: "Creative Workspace",
-    category: "Office",
-    size: "lg:col-span-2 lg:row-span-2",
-  },
-  {
-    image: gallery2,
-    title: "Team Collaboration",
-    category: "Team",
-    size: "",
-  },
-  {
-    image: gallery3,
-    title: "Software Development",
-    category: "Technology",
-    size: "",
-  },
-  {
-    image: gallery4,
-    title: "Digital Innovation",
-    category: "Innovation",
-    size: "lg:col-span-2",
-  },
-  {
-    image: gallery5,
-    title: "Project Success",
-    category: "Success",
-    size: "",
-  },
+const photos = [
+  { image: gallery1, title: "Creative Workspace", category: "Office" },
+  { image: gallery2, title: "Team Collaboration", category: "Team" },
+  { image: gallery3, title: "Software Development", category: "Technology" },
+  { image: gallery4, title: "Digital Innovation", category: "Innovation" },
+  { image: gallery5, title: "Project Success", category: "Success" },
 ];
 
-const GalleryBackground = () => {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <svg
-        className="absolute inset-0 h-full w-full"
-        viewBox="0 0 1440 1050"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <pattern
-            id="galleryGrid"
-            width="54"
-            height="54"
-            patternUnits="userSpaceOnUse"
+const brandGradient = "bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74]";
+const textGradient = `${brandGradient} bg-clip-text text-transparent`;
+const pad = (i) => String(i + 1).padStart(2, "0");
+
+/* ---------------- Lightbox ---------------- */
+const Lightbox = ({ index, onClose, onPrev, onNext }) => {
+  const photo = photos[index];
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") onPrev();
+      if (e.key === "ArrowRight") onNext();
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    getLenis()?.stop();
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+      getLenis()?.start();
+    };
+  }, [onClose, onPrev, onNext]);
+
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={photo.title}
+      className="fixed inset-0 z-[100] flex flex-col bg-[#0d0420]/95 p-4 font-arimo text-white backdrop-blur-xl sm:p-8"
+      style={{ animation: "glFade 0.35s ease-out" }}
+      onClick={onClose}
+    >
+      <div className="flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
+        <span className="text-sm font-semibold tabular-nums text-white/60">
+          <span className="text-white">{pad(index)}</span> / {pad(photos.length - 1)}
+        </span>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close preview"
+          className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/10 transition-colors hover:bg-white hover:text-[#1b0b3a]"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+
+      <div className="relative flex flex-1 items-center justify-center py-6">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onPrev();
+          }}
+          aria-label="Previous photo"
+          className="absolute left-0 z-10 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/10 transition-colors hover:bg-white hover:text-[#1b0b3a] sm:h-14 sm:w-14"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+
+        <figure
+          key={index}
+          className="relative w-full max-w-4xl"
+          style={{ animation: "glZoom 0.5s cubic-bezier(0.22,1,0.36,1)" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className={`absolute -inset-6 rounded-[40px] ${brandGradient} opacity-25 blur-3xl`} />
+          <img
+            src={photo.image}
+            alt={photo.title}
+            className="relative max-h-[70svh] w-full rounded-3xl object-contain shadow-2xl ring-1 ring-white/15"
+          />
+          <figcaption className="relative mt-5 flex items-center justify-between gap-4">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-[0.25em] text-[#ff7ac0]">{photo.category}</span>
+              <h3 className="mt-1 text-2xl font-semibold sm:text-3xl">{photo.title}</h3>
+            </div>
+          </figcaption>
+        </figure>
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onNext();
+          }}
+          aria-label="Next photo"
+          className="absolute right-0 z-10 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/10 transition-colors hover:bg-white hover:text-[#1b0b3a] sm:h-14 sm:w-14"
+        >
+          <ArrowRight className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* Thumbnails */}
+      <div className="flex justify-center gap-2" onClick={(e) => e.stopPropagation()}>
+        {photos.map((p, i) => (
+          <button
+            key={p.title}
+            type="button"
+            onClick={() => onNext(i)}
+            aria-label={`Show ${p.title}`}
+            className={`h-14 w-20 cursor-pointer overflow-hidden rounded-xl transition-all duration-300 sm:h-16 sm:w-24 ${
+              i === index ? "ring-2 ring-[#f062c0] ring-offset-2 ring-offset-[#0d0420]" : "opacity-40 hover:opacity-80"
+            }`}
           >
-            <path
-              d="M54 0H0V54"
-              fill="none"
-              stroke="#3b1578"
-              strokeWidth="0.7"
-              opacity="0.07"
-            />
-          </pattern>
-
-          <linearGradient id="galleryGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#3b1578" />
-            <stop offset="50%" stopColor="#a31180" />
-            <stop offset="100%" stopColor="#d10c74" />
-          </linearGradient>
-        </defs>
-
-        <rect width="1440" height="1050" fill="url(#galleryGrid)" />
-
-        <circle cx="120" cy="190" r="260" fill="#3b1578" opacity="0.12" />
-        <circle cx="1260" cy="240" r="290" fill="#a31180" opacity="0.12" />
-        <circle cx="720" cy="950" r="350" fill="#d10c74" opacity="0.1" />
-
-        <path
-          className="gallery-wave"
-          d="M-100 240C180 90 430 390 710 220C990 50 1120 350 1540 150"
-          stroke="url(#galleryGradient)"
-          strokeWidth="2"
-          opacity="0.2"
-        />
-
-        <path
-          className="gallery-wave"
-          d="M-100 820C180 660 440 950 740 780C1040 610 1190 890 1540 690"
-          stroke="url(#galleryGradient)"
-          strokeWidth="2"
-          opacity="0.14"
-        />
-
-        <text
-          className="gallery-code"
-          x="110"
-          y="720"
-          fill="#3b1578"
-          opacity="0.1"
-          fontSize="100"
-          fontWeight="900"
-        >
-          {"</>"}
-        </text>
-
-        <text
-          className="gallery-code"
-          x="1180"
-          y="480"
-          fill="#d10c74"
-          opacity="0.1"
-          fontSize="90"
-          fontWeight="900"
-        >
-          {"{}"}
-        </text>
-      </svg>
-
-      <div className="absolute -left-40 top-24 h-96 w-96 rounded-full bg-[#3b1578]/20 blur-3xl" />
-      <div className="absolute -right-40 top-40 h-[430px] w-[430px] rounded-full bg-[#a31180]/20 blur-3xl" />
-      <div className="absolute bottom-10 left-1/2 h-[460px] w-[460px] -translate-x-1/2 rounded-full bg-[#d10c74]/20 blur-3xl" />
-    </div>
+            <img src={p.image} alt="" className="h-full w-full object-cover" />
+          </button>
+        ))}
+      </div>
+    </div>,
+    document.body,
   );
 };
 
+/* ---------------- Photo card ---------------- */
+const PhotoCard = ({ photo, index, onOpen }) => (
+  <button
+    type="button"
+    onClick={() => onOpen(index)}
+    className="gl-card group relative shrink-0 cursor-pointer snap-center text-left"
+    aria-label={`Open ${photo.title}`}
+  >
+    <div className="relative h-[52svh] max-h-[460px] min-h-[300px] w-[78vw] max-w-[620px] overflow-hidden rounded-[32px] bg-[#1b0b3a] shadow-[0_40px_80px_-35px_rgba(59,21,120,0.7)] sm:w-[60vw] lg:w-[46vw]">
+      <img
+        src={photo.image}
+        alt={photo.title}
+        loading="lazy"
+        draggable="false"
+        className="gl-img absolute inset-y-0 -left-[8%] h-full w-[116%] max-w-none object-cover transition-[filter] duration-700 group-hover:brightness-110"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#1b0b3a]/85 via-[#1b0b3a]/10 to-transparent" />
+      <div className={`absolute inset-x-0 top-0 h-1 origin-left scale-x-0 ${brandGradient} transition-transform duration-700 group-hover:scale-x-100`} />
+
+      <span className="absolute right-5 top-5 flex h-12 w-12 scale-75 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur-md transition-all duration-500 group-hover:scale-100 group-hover:opacity-100">
+        <Expand className="h-5 w-5" />
+      </span>
+
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 text-white sm:p-8">
+        <div>
+          <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest backdrop-blur">
+            {photo.category}
+          </span>
+          <h3 className="mt-3 text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">{photo.title}</h3>
+        </div>
+        <span className="text-6xl font-semibold leading-none text-transparent [-webkit-text-stroke:1.5px_rgba(255,255,255,0.5)] sm:text-7xl">
+          {pad(index)}
+        </span>
+      </div>
+    </div>
+  </button>
+);
+
+/* ---------------- Page ---------------- */
 const Gallery = () => {
-  const sectionRef = useRef(null);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const pageRef = useRef(null);
+  const stripRef = useRef(null);
+  const trackRef = useRef(null);
+  const [openIndex, setOpenIndex] = useState(null);
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".gallery-reveal",
-        { y: 55, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.14,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
-          },
-        },
-      );
+  const close = useCallback(() => setOpenIndex(null), []);
+  const prev = useCallback(() => setOpenIndex((i) => (i - 1 + photos.length) % photos.length), []);
+  const next = useCallback(
+    (to) => setOpenIndex((i) => (typeof to === "number" ? to : (i + 1) % photos.length)),
+    [],
+  );
 
-      gsap.fromTo(
-        ".gallery-card",
-        { y: 70, opacity: 0, scale: 0.94 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.95,
-          stagger: 0.13,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".gallery-grid",
-            start: "top 78%",
-          },
-        },
-      );
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
 
-      gsap.to(".gallery-wave", {
-        x: 35,
-        duration: 4,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        gsap
+          .timeline({ defaults: { ease: "power4.out" } })
+          .from(".gl-hero-line", { yPercent: 110, duration: 1.1, stagger: 0.1 })
+          .from(".gl-hero-fade", { y: 30, opacity: 0, duration: 0.9, stagger: 0.08 }, 0.4)
+          .from(".gl-card", { x: 120, opacity: 0, duration: 1.2, stagger: 0.1 }, 0.5);
+
+        gsap.utils.toArray(".gl-reveal").forEach((el) => {
+          gsap.from(el, {
+            y: 50,
+            opacity: 0,
+            duration: 1.1,
+            ease: "power3.out",
+            scrollTrigger: { trigger: el, start: "top 88%" },
+          });
+        });
       });
 
-      gsap.to(".gallery-code", {
-        y: -18,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        stagger: 0.35,
-        ease: "sine.inOut",
+      // Desktop: vertical scroll drives a horizontal film strip
+      mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
+        const track = trackRef.current;
+        const distance = () => track.scrollWidth - window.innerWidth;
+
+        const tween = gsap.to(track, {
+          x: () => -distance(),
+          ease: "none",
+          scrollTrigger: {
+            trigger: stripRef.current,
+            start: "top top",
+            end: () => `+=${distance()}`,
+            pin: true,
+            scrub: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => gsap.set(".gl-progress", { scaleX: self.progress }),
+          },
+        });
+
+        // Parallax inside each photo while it travels across the screen
+        gsap.utils.toArray(".gl-card").forEach((card) => {
+          const image = card.querySelector(".gl-img");
+          if (!image) return;
+          gsap.fromTo(
+            image,
+            { xPercent: -6 },
+            {
+              xPercent: 6,
+              ease: "none",
+              scrollTrigger: {
+                trigger: card,
+                containerAnimation: tween,
+                start: "left right",
+                end: "right left",
+                scrub: true,
+              },
+            },
+          );
+        });
       });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  useEffect(() => {
-    if (!selectedImage) return;
-
-    gsap.fromTo(
-      ".gallery-popup",
-      { opacity: 0, scale: 0.9, y: 40 },
-      { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: "power3.out" },
-    );
-  }, [selectedImage]);
+    },
+    { scope: pageRef },
+  );
 
   return (
-    <main
-      ref={sectionRef}
-      className="relative overflow-hidden bg-primary-bg px-6 py-24 font-arimo sm:px-10 lg:px-20"
-    >
-      <GalleryBackground />
-
-      <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="mx-auto mb-16 max-w-4xl text-center">
-          <div className="gallery-reveal mx-auto mb-5 inline-flex items-center gap-3 rounded-full border border-[#a31180]/15 bg-white/80 px-5 py-2 shadow-sm backdrop-blur-md">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#d10c74]" />
-            <span className="text-sm font-bold uppercase tracking-[0.25em] text-[#3b1578]">
+    <main ref={pageRef} className="relative bg-transparent font-arimo text-[#1b0b3a]">
+      {/* ================= FILM STRIP (with hero) ================= */}
+      <section ref={stripRef} className="relative flex min-h-svh flex-col justify-center overflow-hidden pb-12 pt-16 lg:h-svh lg:pt-24">
+        <div className="container mx-auto flex flex-col justify-between gap-6 px-4 lg:flex-row lg:items-end">
+          <div>
+            <div className="gl-hero-fade inline-flex items-center gap-3 text-sm font-bold uppercase tracking-[0.3em] text-[#a31180]">
+              <span className={`h-0.5 w-10 rounded-full ${brandGradient}`} />
               Our Gallery
-            </span>
-          </div>
-
-          <h1 className="gallery-reveal text-4xl font-black leading-tight text-slate-950 sm:text-5xl lg:text-7xl">
-            Explore Our{" "}
-            <span className="bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] bg-clip-text text-transparent">
-              Creative Moments
-            </span>
-          </h1>
-
-          <p className="gallery-reveal mx-auto mt-6 max-w-3xl text-base font-medium leading-8 text-slate-600 sm:text-lg">
-            A visual showcase of our workspace, teamwork, innovation, and
-            digital journey with MerinaSoft.
-          </p>
-        </div>
-
-        <div className="gallery-grid grid auto-rows-[280px] gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {galleryImages.map((item, index) => (
-            <div
-              key={index}
-              onClick={() => setSelectedImage(item)}
-              className={`gallery-card group relative cursor-pointer overflow-hidden rounded-[34px] border border-white bg-white/80 p-3 shadow-[0_25px_80px_rgba(59,21,120,0.10)] backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_35px_110px_rgba(163,17,128,0.20)] ${item.size}`}
-            >
-              <div className="relative h-full overflow-hidden rounded-[26px]">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110"
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent opacity-80 transition-all duration-500 group-hover:opacity-95" />
-
-                <div className="absolute left-5 top-5 rounded-full bg-white/90 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-[#3b1578] shadow-lg backdrop-blur-md">
-                  {item.category}
-                </div>
-
-                <div className="absolute bottom-5 left-5 right-5">
-                  <h3 className="text-2xl font-black leading-tight text-white drop-shadow-xl">
-                    {item.title}
-                  </h3>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-sm font-semibold text-white/75">
-                      Click to Preview
-                    </span>
-
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-xl font-black text-[#3b1578] shadow-lg transition-all duration-300 group-hover:rotate-45 group-hover:bg-gradient-to-r group-hover:from-[#3b1578] group-hover:via-[#a31180] group-hover:to-[#d10c74] group-hover:text-white">
-                      +
-                    </span>
-                  </div>
-                </div>
-
-                <div className="absolute inset-x-0 bottom-0 h-1 w-0 bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] transition-all duration-500 group-hover:w-full" />
-              </div>
             </div>
-          ))}
-        </div>
-
-        <div className="gallery-reveal mt-16 overflow-hidden rounded-[40px] bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] p-[1px] shadow-[0_35px_110px_rgba(163,17,128,0.25)]">
-          <div className="rounded-[39px] bg-slate-950 px-8 py-12 text-center sm:px-12">
-            <h2 className="text-3xl font-black leading-tight text-white sm:text-4xl">
-              Every project has a story. We build it beautifully.
-            </h2>
-
-            <p className="mx-auto mt-5 max-w-3xl text-base font-medium leading-8 text-white/70">
-              From planning to design, development, and delivery — our team
-              works with passion to create meaningful digital experiences.
+            <h1 className="mt-5 text-[clamp(2.6rem,6.5vw,5.5rem)] font-semibold leading-[1.02] tracking-[-0.035em]">
+              <span className="block overflow-hidden pb-[0.08em]">
+                <span className="gl-hero-line block">
+                  Inside <span className={`${textGradient} italic`}>MerinaSoft.</span>
+                </span>
+              </span>
+            </h1>
+          </div>
+          <div className="gl-hero-fade max-w-md">
+            <p className="text-base leading-8 text-gray-600 sm:text-lg">
+              A visual showcase of our workspace, teamwork, innovation and digital
+              journey.
+            </p>
+            <p className="mt-3 hidden items-center gap-2 text-sm font-semibold text-[#a31180] lg:flex">
+              Scroll to explore <MoveRight className="h-4 w-4 animate-pulse" />
             </p>
           </div>
         </div>
-      </div>
 
-      {selectedImage && (
+        {/* Track */}
         <div
-          onClick={() => setSelectedImage(null)}
-          className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-950/80 px-5 backdrop-blur-md"
+          ref={trackRef}
+          className="mt-10 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4 [scrollbar-width:none] lg:snap-none lg:overflow-visible lg:px-[8vw]"
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="gallery-popup relative w-full max-w-5xl overflow-hidden rounded-[34px] border border-white/20 bg-white p-4 shadow-[0_35px_120px_rgba(0,0,0,0.45)]"
-          >
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute right-5 top-5 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl font-black text-slate-950 shadow-xl transition-all duration-300 hover:bg-[#d10c74] hover:text-white"
-            >
-              ×
-            </button>
+          {photos.map((photo, i) => (
+            <PhotoCard key={photo.title} photo={photo} index={i} onOpen={setOpenIndex} />
+          ))}
 
-            <div className="relative overflow-hidden rounded-[26px]">
-              <img
-                src={selectedImage.image}
-                alt={selectedImage.title}
-                className="max-h-[75vh] w-full object-cover"
-              />
-
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent p-8">
-                <span className="mb-3 inline-flex rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-white">
-                  {selectedImage.category}
+          {/* Closing story card */}
+          <div className="gl-card relative flex h-[52svh] max-h-[460px] min-h-[300px] w-[78vw] max-w-[520px] shrink-0 snap-center flex-col justify-between overflow-hidden rounded-[32px] bg-[#1b0b3a] p-8 text-white sm:w-[50vw] sm:p-10 lg:w-[34vw]">
+            <div className={`pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full ${brandGradient} opacity-50 blur-3xl`} />
+            <span className="relative text-sm font-bold uppercase tracking-[0.3em] text-[#ff7ac0]">Our Story</span>
+            <div className="relative">
+              <h2 className="text-3xl font-semibold leading-tight tracking-[-0.02em] sm:text-4xl">
+                Every project has a story. We build it{" "}
+                <span className="bg-gradient-to-r from-[#c9a6ff] via-[#f062c0] to-[#ff7ac0] bg-clip-text text-transparent italic">
+                  beautifully.
                 </span>
-
-                <h3 className="text-3xl font-black text-white">
-                  {selectedImage.title}
-                </h3>
-              </div>
+              </h2>
+              <p className="mt-4 leading-7 text-white/65">
+                From planning to design, development and delivery — our team works
+                with passion to create meaningful digital experiences.
+              </p>
             </div>
+            <Link
+              to="/contact"
+              className={`relative inline-flex items-center gap-2 self-start rounded-full ${brandGradient} px-6 py-3 font-semibold transition-transform duration-300 hover:-translate-y-0.5`}
+            >
+              Start Your Story <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
+
+          {/* Spacer so the last card can reach the centre */}
+          <div className="hidden w-[8vw] shrink-0 lg:block" />
         </div>
-      )}
+
+        {/* Progress */}
+        <div className="container mx-auto mt-8 hidden items-center gap-4 px-4 lg:flex">
+          <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">Start</span>
+          <div className="relative h-1 flex-1 overflow-hidden rounded-full bg-[#3b1578]/10">
+            <div className={`gl-progress absolute inset-0 origin-left scale-x-0 rounded-full ${brandGradient}`} />
+          </div>
+          <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">End</span>
+        </div>
+      </section>
+
+      {/* ================= MOSAIC ================= */}
+      <section className="container mx-auto px-4 py-24">
+        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <h2 className="gl-reveal max-w-2xl text-[clamp(2rem,4.5vw,3.75rem)] font-semibold leading-[1.08] tracking-[-0.03em]">
+            Moments from our <span className={`${textGradient} italic`}>everyday.</span>
+          </h2>
+          <p className="gl-reveal max-w-sm text-gray-600">Tap any photo to open it in full view.</p>
+        </div>
+
+        <div className="mt-12 grid auto-rows-[220px] gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-[240px]">
+          {photos.map((photo, i) => (
+            <button
+              key={photo.title}
+              type="button"
+              onClick={() => setOpenIndex(i)}
+              className={`gl-reveal group relative cursor-pointer overflow-hidden rounded-[28px] text-left ${
+                ["sm:col-span-2 lg:col-span-2 lg:row-span-2", "", "", "", ""][i]
+              }`}
+              aria-label={`Open ${photo.title}`}
+            >
+              <img
+                src={photo.image}
+                alt={photo.title}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1b0b3a]/80 via-transparent to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
+              <div className="absolute inset-x-0 bottom-0 translate-y-2 p-6 text-white transition-transform duration-500 group-hover:translate-y-0">
+                <span className="text-xs font-semibold uppercase tracking-[0.25em] text-[#ff7ac0]">{photo.category}</span>
+                <h3 className="mt-1 text-xl font-semibold">{photo.title}</h3>
+              </div>
+              <span className="absolute right-5 top-5 flex h-11 w-11 scale-75 items-center justify-center rounded-full bg-white/20 text-white opacity-0 backdrop-blur-md transition-all duration-500 group-hover:scale-100 group-hover:opacity-100">
+                <Expand className="h-4 w-4" />
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ================= CTA ================= */}
+      <section className="container mx-auto px-4 pb-28 text-center">
+        <h2 className="gl-reveal mx-auto max-w-3xl text-[clamp(2rem,5vw,4rem)] font-semibold leading-[1.06] tracking-[-0.03em]">
+          Want to be part of our <span className={`${textGradient} italic`}>next story?</span>
+        </h2>
+        <div className="gl-reveal mt-10 flex flex-wrap justify-center gap-4">
+          <Link
+            to="/contact"
+            className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-full ${brandGradient} px-8 py-4 font-semibold text-white shadow-[0_20px_50px_-12px_#d10c74] transition-transform duration-300 hover:-translate-y-1`}
+          >
+            <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+            <span className="relative">Start a Project</span>
+            <ArrowRight className="relative h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
+          <Link
+            to="/about"
+            className="inline-flex items-center gap-2 rounded-full border border-[#3b1578]/20 bg-white/60 px-8 py-4 font-semibold text-[#3b1578] backdrop-blur transition-all duration-300 hover:border-[#a31180]/40 hover:text-[#a31180]"
+          >
+            About Us
+          </Link>
+        </div>
+      </section>
+
+      {openIndex !== null && <Lightbox index={openIndex} onClose={close} onPrev={prev} onNext={next} />}
+
+      <style>{`
+        @keyframes glFade { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes glZoom { from { opacity: 0; transform: scale(0.94) translateY(20px) } to { opacity: 1; transform: none } }
+      `}</style>
     </main>
   );
 };

@@ -420,8 +420,8 @@ const sections = [
 
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-700">
-      <section className="relative overflow-hidden border-b border-slate-200 bg-white">
+    <div className="min-h-screen bg-transparent text-slate-700">
+      <section className="relative overflow-hidden border-b border-slate-200 bg-transparent">
         <div className="absolute -right-32 -top-40 h-[420px] w-[420px] rounded-full bg-blue-50 blur-3xl" />
 
         <div className="absolute -left-40 top-20 h-[350px] w-[350px] rounded-full bg-indigo-50 blur-3xl" />
@@ -660,9 +660,6 @@ const PrivacyPolicy = () => {
       </main>
 
       <style>{`
-        html {
-          scroll-behavior: smooth;
-        }
 
         .privacy-notice {
           display: flex;

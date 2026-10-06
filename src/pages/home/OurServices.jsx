@@ -1,4 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useLayoutEffect, useMemo, useRef } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
@@ -8,359 +10,418 @@ import {
   FaMobileScreenButton,
   FaBullhorn,
   FaCloud,
-  FaArrowRightLong,
 } from "react-icons/fa6";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const SCAN = "#f062c0";
+const yearsOfExperience = new Date().getFullYear() - 2018;
+
+const unsplash = (id) =>
+  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=80`;
 
 const services = [
   {
     icon: FaLaptopCode,
     title: "Software Development",
-    description:
-      "Software development solutions to drive your digital success. Unlock new possibilities for your business with MerinaSoft BD’s expert software consulting and development services.",
-    number: "01",
+    text: "Software development solutions to drive your digital success. Unlock new possibilities for your business with MerinaSoft BD’s expert software consulting and development services.",
+    tags: ["Consulting", "Business Software", "Automation"],
+    image: unsplash("1498050108023-c5249f4df085"),
   },
   {
     icon: FaCode,
     title: "Custom Software Development",
-    description:
-      "Tailored to your business requirements. With 7+ years of experience across 12+ industries, MerinaSoft BD delivers powerful and reliable custom software solutions.",
-    number: "02",
+    text: `Tailored to your business requirements. With ${yearsOfExperience}+ years of experience across 12+ industries, MerinaSoft BD delivers powerful and reliable custom software solutions.`,
+    tags: ["Tailored", "Scalable", "Reliable"],
+    image: unsplash("1555066931-4365d14bab8c"),
   },
   {
     icon: FaGlobe,
-    title: "Web Development Service",
-    description:
-      "We provide high-quality web design and development, database design, integration, programming, website maintenance, e-commerce solutions, and application development.",
-    number: "03",
+    title: "Web Development",
+    text: "High-quality web design and development, database design, integration, programming, website maintenance, e-commerce solutions, and application development.",
+    tags: ["Web Design", "E-commerce", "Maintenance"],
+    image: unsplash("1547658719-da2b51169166"),
   },
   {
     icon: FaMobileScreenButton,
     title: "Mobile Application",
-    description:
-      "Crafting high-end mobile experiences with unmatched expertise. Since 2018, MerinaSoft BD has created native, cross-platform, and progressive web applications.",
-    number: "04",
+    text: "Crafting high-end mobile experiences with unmatched expertise. Since 2018, MerinaSoft BD has created native, cross-platform, and progressive web applications.",
+    tags: ["Native", "Cross-platform", "PWA"],
+    image: unsplash("1512941937669-90a1b58e7e9c"),
   },
   {
     icon: FaBullhorn,
     title: "Digital Marketing",
-    description:
-      "We help companies reach their target audience, improve brand awareness, and drive sales through SEO, social media marketing, content marketing, and email marketing.",
-    number: "05",
+    text: "We help companies reach their target audience, improve brand awareness, and drive sales through SEO, social media marketing, content marketing, and email marketing.",
+    tags: ["SEO", "Social Media", "Email"],
+    image: unsplash("1460925895917-afdab827c52f"),
   },
   {
     icon: FaCloud,
-    title: "Cloud Application Development",
-    description:
-      "MerinaSoft BD offers cloud application development services that help businesses build and run powerful cloud-based apps using modern cloud technologies.",
-    number: "06",
+    title: "Cloud Application",
+    text: "Cloud application development services that help businesses build and run powerful cloud-based apps using modern cloud technologies.",
+    tags: ["Cloud Apps", "Modern Stack", "Always On"],
+    image: unsplash("1451187580459-43490279c0fa"),
   },
 ];
 
-const ServicesBackground = () => {
+const titleWords = [
+  { word: "Services" },
+  { word: "built" },
+  { word: "to" },
+  { word: "scale", accent: true },
+  { word: "your" },
+  { word: "business." },
+];
+
+const brandGradient = "bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74]";
+const textGradient = `${brandGradient} bg-clip-text text-transparent`;
+const pad = (i) => String(i + 1).padStart(2, "0");
+
+const ServicePanel = ({ service, index, reduced, registerRef, total }) => {
+  const imageLeft = index % 2 === 0;
+  const Icon = service.icon;
+
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <svg
-        className="absolute inset-0 h-full w-full"
-        viewBox="0 0 1440 1050"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+    <section
+      ref={registerRef}
+      aria-label={service.title}
+      style={{ zIndex: index + 1 }}
+      className={`relative w-full ${reduced ? "py-16" : "h-svh min-h-[640px]"} ${
+        index % 2 === 0 ? "bg-(--color-primary-bg)" : "bg-[#faf4fb]"
+      } ${
+        index > 0
+          ? "rounded-t-[36px] shadow-[0_-40px_80px_-40px_rgba(59,21,120,0.4)]"
+          : ""
+      }`}
+    >
+      <div
+        data-inner
+        className={`flex items-center ${reduced ? "" : "h-full pb-14 pt-[100px]"}`}
       >
-        <defs>
-          <pattern
-            id="servicesGrid"
-            width="48"
-            height="48"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d="M48 0H0V48"
-              fill="none"
-              stroke="#3b1578"
-              strokeWidth="0.7"
-              opacity="0.08"
-            />
-          </pattern>
+        <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-8 lg:h-[min(68svh,620px)] lg:grid-cols-2 lg:gap-16">
+            {/* ---------- Image with scan reveal ---------- */}
+            <div
+              className={`relative h-[30svh] min-h-[190px] w-full lg:h-full ${
+                imageLeft ? "lg:order-1" : "lg:order-2"
+              }`}
+            >
+              <div
+                className={`absolute -inset-3 rounded-[34px] ${brandGradient} opacity-20 blur-2xl`}
+              />
+              <div className="relative h-full w-full overflow-hidden rounded-[28px] bg-[#1b0b3a] shadow-[0_40px_80px_-40px_rgba(59,21,120,0.65)]">
+                {!reduced && (
+                  <img
+                    data-dim
+                    src={service.image}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 h-full w-full object-cover"
+                    style={{ filter: "grayscale(1) brightness(0.45) blur(5px)" }}
+                  />
+                )}
+                <img
+                  data-sharp
+                  src={service.image}
+                  alt={service.title}
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[#3b1578]/40 via-transparent to-[#d10c74]/20 mix-blend-multiply" />
 
-          <linearGradient id="serviceGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#3b1578" />
-            <stop offset="50%" stopColor="#a31180" />
-            <stop offset="100%" stopColor="#d10c74" />
-          </linearGradient>
-        </defs>
+                {!reduced && (
+                  <>
+                    <div
+                      data-grid
+                      className="pointer-events-none absolute inset-0"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(rgba(240,98,192,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(240,98,192,0.18) 1px, transparent 1px)",
+                        backgroundSize: "36px 36px",
+                      }}
+                    />
+                    <div
+                      data-scan
+                      className="pointer-events-none absolute inset-x-0 top-0 h-[2px]"
+                      style={{
+                        backgroundColor: SCAN,
+                        boxShadow: `0 0 22px 6px ${SCAN}88, 0 -34px 60px 18px ${SCAN}22`,
+                      }}
+                    />
+                    <div data-brackets className="pointer-events-none absolute inset-4">
+                      <span className="absolute left-0 top-0 h-6 w-6 rounded-tl-md border-l-2 border-t-2 border-[#f062c0]/80" />
+                      <span className="absolute right-0 top-0 h-6 w-6 rounded-tr-md border-r-2 border-t-2 border-[#f062c0]/80" />
+                      <span className="absolute bottom-0 left-0 h-6 w-6 rounded-bl-md border-b-2 border-l-2 border-[#f062c0]/80" />
+                      <span className="absolute bottom-0 right-0 h-6 w-6 rounded-br-md border-b-2 border-r-2 border-[#f062c0]/80" />
+                    </div>
+                  </>
+                )}
 
-        <rect width="1440" height="1050" fill="url(#servicesGrid)" />
+                {/* Icon badge */}
+                <div className="absolute bottom-5 left-5 flex items-center gap-3 rounded-2xl border border-white/20 bg-white/15 py-2 pl-2 pr-4 text-white backdrop-blur-md">
+                  <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${brandGradient} text-lg`}>
+                    <Icon />
+                  </span>
+                  <span className="text-sm font-bold">MerinaSoft</span>
+                </div>
+              </div>
+            </div>
 
-        <circle cx="150" cy="160" r="260" fill="#3b1578" opacity="0.12" />
-        <circle cx="1260" cy="230" r="280" fill="#a31180" opacity="0.12" />
-        <circle cx="720" cy="920" r="340" fill="#d10c74" opacity="0.1" />
+            {/* ---------- Copy ---------- */}
+            <div className={`relative ${imageLeft ? "lg:order-2" : "lg:order-1"}`}>
+              <span
+                aria-hidden="true"
+                className="sv-t pointer-events-none absolute -top-16 left-0 hidden select-none text-[clamp(120px,15vw,210px)] font-black leading-none text-[#3b1578]/[0.06] lg:block"
+              >
+                {pad(index)}
+              </span>
 
-        <path
-          className="service-wave"
-          d="M-100 240C190 80 370 390 640 230C910 70 1100 350 1540 150"
-          stroke="url(#serviceGradient)"
-          strokeWidth="2"
-          opacity="0.22"
-        />
+              <span className="sv-t relative inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.25em] text-[#a31180]">
+                <Icon className="h-4 w-4" />
+                Service {pad(index)}
+              </span>
 
-        <path
-          className="service-wave"
-          d="M-100 780C160 660 400 940 690 760C980 580 1130 850 1540 690"
-          stroke="url(#serviceGradient)"
-          strokeWidth="2"
-          opacity="0.16"
-        />
+              <h3 className="sv-t relative mt-4 text-[clamp(28px,3.6vw,52px)] font-black leading-[1.08] tracking-tight text-[#1b0b3a]">
+                {service.title}
+              </h3>
+              <span className={`sv-t mt-5 block h-[3px] w-14 rounded-full ${brandGradient} sm:mt-6`} />
+              <p className="sv-t mt-5 max-w-md text-[15.5px] leading-relaxed text-[#1b0b3a]/70 sm:mt-6 sm:text-[17px]">
+                {service.text}
+              </p>
 
-        <path
-          className="service-line"
-          d="M180 500H360V390H530"
-          stroke="#3b1578"
-          strokeWidth="2"
-          strokeLinecap="round"
-          opacity="0.22"
-        />
+              <div className="sv-t mt-6 flex flex-wrap gap-2">
+                {service.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-[#a31180]/15 bg-white/70 px-4 py-1.5 text-xs font-bold text-[#a31180]"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
 
-        <path
-          className="service-line"
-          d="M1220 470H1040V610H850"
-          stroke="#d10c74"
-          strokeWidth="2"
-          strokeLinecap="round"
-          opacity="0.2"
-        />
+              <Link
+                to="/services"
+                className="sv-t group mt-7 inline-flex items-center gap-3 text-[15px] font-bold text-[#1b0b3a] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a31180] sm:mt-9"
+              >
+                <span className="border-b-2 border-transparent pb-0.5 transition-colors duration-300 group-hover:border-[#d10c74]">
+                  Explore Service
+                </span>
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#3b1578]/20 transition-all duration-300 group-hover:border-transparent group-hover:bg-gradient-to-r group-hover:from-[#3b1578] group-hover:to-[#d10c74] group-hover:text-white">
+                  <ArrowRight
+                    size={18}
+                    className="transition-transform duration-300 group-hover:translate-x-0.5"
+                  />
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <circle
-          className="service-node"
-          cx="180"
-          cy="500"
-          r="7"
-          fill="#3b1578"
-          opacity="0.4"
-        />
-        <circle
-          className="service-node"
-          cx="360"
-          cy="390"
-          r="7"
-          fill="#a31180"
-          opacity="0.4"
-        />
-        <circle
-          className="service-node"
-          cx="530"
-          cy="390"
-          r="7"
-          fill="#d10c74"
-          opacity="0.4"
-        />
-        <circle
-          className="service-node"
-          cx="1220"
-          cy="470"
-          r="7"
-          fill="#d10c74"
-          opacity="0.4"
-        />
-        <circle
-          className="service-node"
-          cx="1040"
-          cy="610"
-          r="7"
-          fill="#3b1578"
-          opacity="0.4"
-        />
-        <circle
-          className="service-node"
-          cx="850"
-          cy="610"
-          r="7"
-          fill="#a31180"
-          opacity="0.4"
-        />
+      {!reduced && (
+        <>
+          <div
+            data-veil
+            className="pointer-events-none absolute inset-0 rounded-t-[36px] bg-[#1b0b3a] opacity-0"
+          />
 
-        <text
-          className="service-code"
-          x="110"
-          y="700"
-          fill="#3b1578"
-          opacity="0.13"
-          fontSize="76"
-          fontWeight="900"
-        >
-          {"</>"}
-        </text>
-
-        <text
-          className="service-code"
-          x="1180"
-          y="365"
-          fill="#d10c74"
-          opacity="0.14"
-          fontSize="68"
-          fontWeight="900"
-        >
-          {"{}"}
-        </text>
-      </svg>
-
-      <div className="absolute -left-32 top-24 h-96 w-96 rounded-full bg-[#3b1578]/20 blur-3xl" />
-      <div className="absolute -right-32 top-32 h-[420px] w-[420px] rounded-full bg-[#a31180]/20 blur-3xl" />
-      <div className="absolute bottom-16 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#d10c74]/20 blur-3xl" />
-    </div>
+          <div className="pointer-events-none absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-3">
+            <span className="text-[14px] font-bold tabular-nums text-[#1b0b3a]">
+              {pad(index)}
+            </span>
+            <span className="flex gap-1.5">
+              {Array.from({ length: total }, (_, i) => (
+                <span
+                  key={i}
+                  className={`h-[3px] w-5 rounded-full sm:w-8 ${
+                    i <= index ? brandGradient : "bg-[#3b1578]/10"
+                  }`}
+                />
+              ))}
+            </span>
+            <span className="text-[14px] font-semibold tabular-nums text-[#1b0b3a]/40">
+              {pad(total - 1)}
+            </span>
+          </div>
+        </>
+      )}
+    </section>
   );
 };
 
 const OurServices = () => {
   const sectionRef = useRef(null);
+  const headRef = useRef(null);
+  const panelRefs = useRef([]);
 
-  useEffect(() => {
+  const reduced = useMemo(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    [],
+  );
+
+  // Heading: words rise in
+  useLayoutEffect(() => {
+    if (reduced) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".services-reveal",
-        { y: 55, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.15,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
-          },
-        },
-      );
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: headRef.current, start: "top 80%", once: true },
+        })
+        .from(".sv-word", {
+          yPercent: 110,
+          opacity: 0,
+          duration: 0.9,
+          stagger: 0.08,
+          ease: "power4.out",
+        })
+        .from(
+          ".sv-sub",
+          { y: 20, opacity: 0, filter: "blur(8px)", duration: 0.8, ease: "power3.out" },
+          "-=0.5",
+        );
+    }, headRef);
+    return () => ctx.revert();
+  }, [reduced]);
 
-      gsap.fromTo(
-        ".service-card",
-        { y: 70, opacity: 0, scale: 0.94 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.95,
-          stagger: 0.13,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".services-grid",
-            start: "top 78%",
-          },
-        },
-      );
+  // Stacked, pinned panels with scan-line image reveal
+  useLayoutEffect(() => {
+    if (reduced) return;
 
-      gsap.to(".service-wave", {
-        x: 35,
-        duration: 4,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
+    const panels = panelRefs.current.filter(Boolean);
+    const n = panels.length;
+    if (!n) return;
+
+    const ctx = gsap.context(() => {
+      const last = panels[n - 1];
+
+      panels.slice(0, n - 1).forEach((panel) => {
+        ScrollTrigger.create({
+          trigger: panel,
+          start: "top top",
+          endTrigger: last,
+          end: "top top",
+          pin: true,
+          pinSpacing: false,
+          anticipatePin: 1,
+        });
       });
 
-      gsap.to(".service-line", {
-        opacity: 0.45,
-        duration: 1.8,
-        repeat: -1,
-        yoyo: true,
-        stagger: 0.25,
-        ease: "sine.inOut",
-      });
+      panels.forEach((panel, i) => {
+        const sharp = panel.querySelector("[data-sharp]");
+        const dim = panel.querySelector("[data-dim]");
+        const scan = panel.querySelector("[data-scan]");
+        const grid = panel.querySelector("[data-grid]");
+        const brackets = panel.querySelector("[data-brackets]");
+        const texts = panel.querySelectorAll(".sv-t");
+        const state = { v: 0 };
 
-      gsap.to(".service-node", {
-        scale: 1.5,
-        transformOrigin: "center",
-        duration: 1.5,
-        repeat: -1,
-        yoyo: true,
-        stagger: 0.16,
-        ease: "sine.inOut",
-      });
+        const render = () => {
+          const v = state.v;
+          sharp.style.clipPath = `inset(0% 0% ${(1 - v) * 100}% 0%)`;
+          scan.style.top = `${v * 100}%`;
+          scan.style.opacity = v > 0.001 && v < 0.999 ? "1" : "0";
+          grid.style.opacity = `${1 - v}`;
+          brackets.style.opacity = `${1 - Math.min(1, Math.max(0, (v - 0.75) / 0.25))}`;
+        };
+        render();
 
-      gsap.to(".service-code", {
-        y: -18,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        stagger: 0.4,
-        ease: "sine.inOut",
+        gsap
+          .timeline({
+            scrollTrigger: {
+              trigger: panel,
+              start: "top 85%",
+              end: "top 25%",
+              scrub: 0.5,
+            },
+          })
+          .fromTo([sharp, dim], { scale: 1.15 }, { scale: 1, duration: 1, ease: "power1.out" }, 0)
+          .to(state, { v: 1, duration: 0.75, ease: "power1.inOut", onUpdate: render }, 0)
+          .fromTo(
+            texts,
+            { opacity: 0, y: 36 },
+            { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power3.out" },
+            0.3,
+          );
+
+        // Previous panel shrinks and darkens as the next one slides over it
+        if (i < n - 1) {
+          const inner = panel.querySelector("[data-inner]");
+          const veil = panel.querySelector("[data-veil]");
+          gsap.set(inner, { transformOrigin: "50% 0%" });
+
+          gsap
+            .timeline({
+              defaults: { ease: "none" },
+              scrollTrigger: {
+                trigger: panels[i + 1],
+                start: "top bottom",
+                end: "top top",
+                scrub: true,
+              },
+            })
+            .to(inner, { scale: 0.92, yPercent: -3 }, 0)
+            .to(veil, { opacity: 0.4 }, 0);
+        }
       });
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [reduced]);
 
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-primary-bg px-6 py-24 font-arimo sm:px-10 lg:px-20"
+      aria-labelledby="services-heading"
+      className="relative w-full overflow-x-clip bg-transparent font-arimo"
     >
-      <ServicesBackground />
-
-      <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="mx-auto mb-16 max-w-4xl text-center">
-          <div className="services-reveal mx-auto mb-5 inline-flex items-center gap-3 rounded-full border border-[#a31180]/15 bg-white/80 px-5 py-2 shadow-sm backdrop-blur-md">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#d10c74]" />
-            <span className="text-sm font-bold uppercase tracking-[0.25em] text-[#3b1578]">
-              What We Provide
-            </span>
-          </div>
-
-          <h2 className="services-reveal text-4xl font-black leading-tight text-slate-950 sm:text-5xl lg:text-7xl">
-            Our{" "}
-            <span className="bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] bg-clip-text text-transparent">
-              Services
-            </span>
-          </h2>
-
-          <p className="services-reveal mx-auto mt-6 max-w-3xl text-base font-medium leading-8 text-slate-600 sm:text-lg">
-            We deliver powerful software, web, mobile, cloud, and digital
-            marketing solutions that help businesses grow faster, work smarter,
-            and scale with confidence.
-          </p>
+      <div
+        ref={headRef}
+        className="relative mx-auto max-w-3xl px-4 pb-12 pt-20 text-center sm:px-6 sm:pb-16 sm:pt-24"
+      >
+        <div className="sv-sub mb-5 inline-flex items-center gap-3 text-sm font-bold uppercase tracking-[0.3em] text-[#a31180]">
+          <span className={`h-0.5 w-10 rounded-full ${brandGradient}`} />
+          What We Provide
+          <span className={`h-0.5 w-10 rounded-full ${brandGradient}`} />
         </div>
+        <h2
+          id="services-heading"
+          className="text-[clamp(32px,4.8vw,58px)] font-black leading-[1.08] tracking-tight text-[#1b0b3a]"
+        >
+          {titleWords.map(({ word, accent }, i) => (
+            <span
+              key={`${word}-${i}`}
+              className="mr-[0.26em] inline-block overflow-hidden pb-1 align-bottom"
+            >
+              <span className={`sv-word inline-block ${accent ? `${textGradient} italic` : ""}`}>
+                {word}
+              </span>
+            </span>
+          ))}
+        </h2>
+        <p className="sv-sub mx-auto mt-5 max-w-2xl text-[16px] leading-relaxed text-[#1b0b3a]/70 sm:text-[17px]">
+          Software, web, mobile, cloud and digital marketing — everything you need
+          to grow faster, work smarter and scale with confidence.
+        </p>
+      </div>
 
-        <div className="services-grid grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {services.map((service, index) => {
-            const Icon = service.icon;
-
-            return (
-              <div
-                key={index}
-                className="service-card group relative overflow-hidden rounded-[34px] border border-white bg-white/85 p-7 shadow-[0_25px_80px_rgba(59,21,120,0.08)] backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_35px_100px_rgba(163,17,128,0.18)]"
-              >
-                <div className="absolute right-0 top-0 h-32 w-32 rounded-bl-full bg-gradient-to-br from-[#3b1578]/10 via-[#a31180]/10 to-[#d10c74]/10 transition-all duration-500 group-hover:scale-125 group-hover:opacity-80" />
-
-                <div className="absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] transition-all duration-500 group-hover:w-full" />
-
-                <div className="relative z-10">
-                  <div className="mb-7 flex items-center justify-between">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-[#3b1578] via-[#a31180] to-[#d10c74] text-2xl text-white shadow-xl transition-all duration-500 group-hover:rotate-6 group-hover:scale-110">
-                      <Icon />
-                    </div>
-
-                    <span className="text-5xl font-black text-slate-900/5 transition-all duration-500 group-hover:text-[#d10c74]/10">
-                      {service.number}
-                    </span>
-                  </div>
-
-                  <h3 className="mb-4 text-2xl font-black leading-tight text-slate-950">
-                    {service.title}
-                  </h3>
-
-                  <p className="min-h-[150px] text-sm font-medium leading-7 text-slate-600 sm:text-base">
-                    {service.description}
-                  </p>
-
-                  <button className="mt-7 inline-flex items-center gap-3 rounded-full border border-[#a31180]/15 bg-gradient-to-r from-[#3b1578]/5 via-[#a31180]/5 to-[#d10c74]/5 px-5 py-3 text-sm font-black text-[#3b1578] transition-all duration-300 hover:border-transparent hover:bg-gradient-to-r hover:from-[#3b1578] hover:via-[#a31180] hover:to-[#d10c74] hover:text-white">
-                    Explore Service
-                    <FaArrowRightLong className="transition-all duration-300 group-hover:translate-x-1" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
+      <div className="relative">
+        {services.map((service, index) => (
+          <ServicePanel
+            key={service.title}
+            service={service}
+            index={index}
+            reduced={reduced}
+            total={services.length}
+            registerRef={(el) => {
+              panelRefs.current[index] = el;
+            }}
+          />
+        ))}
       </div>
     </section>
   );

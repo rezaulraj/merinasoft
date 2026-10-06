@@ -4,4 +4,30 @@
 @theme {
   --font-arimo: "Arimo", sans-serif;
   --color-primary-bg: #fffef9;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-delayed: float 7s ease-in-out 1.5s infinite;
+  --animate-blob: blob 16s ease-in-out infinite;
+  --animate-spin-slow: spin 7s linear infinite;
+  --animate-blink: blink 1s step-end infinite;
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-marquee-reverse: marquee 40s linear infinite reverse;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+  }
+  @keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(40px, -50px) scale(1.1); }
+    66% { transform: translate(-30px, 30px) scale(0.92); }
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
 }

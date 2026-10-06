@@ -1,35 +1,81 @@
-import React, { useEffect, useRef } from "react";
+import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Users,
+  Code,
+  TrendingUp,
+  HeartHandshake,
+  Lightbulb,
+  Eye,
+  LifeBuoy,
+  BadgeCheck,
+  Copy,
+  Check,
+  Sparkles,
+  CheckCircle2,
+} from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const aboutImages = {
-  team: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=80",
-  office:
-    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80",
-  developer:
-    "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=900&q=80",
+const FOUNDED = 2018;
+const yearsOfExperience = new Date().getFullYear() - FOUNDED;
+const LICENSE_NUMBER = "TRAD/DSCC/325400/2025";
+
+const partnerCount = Object.keys(
+  import.meta.glob("../../assets/partners/partner-*.png", { eager: true }),
+).length;
+
+const img = (id, w = 900) =>
+  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
+
+const images = {
+  team: img("1552664730-d307ca884978"),
+  office: img("1497366754035-f200968a6e72"),
+  developer: img("1515879218367-8466d910aaa4"),
+  meeting: img("1522071820081-009f0129c71c"),
 };
+
+const pillars = [
+  {
+    icon: Users,
+    title: "Collaborative Team",
+    text: "Our company is built on collaboration and teamwork. We believe the best results come from working together with open communication.",
+  },
+  {
+    icon: Code,
+    title: "Smart Software",
+    text: "We create software that is powerful, reliable, user-friendly, and tailored to meet each client’s specific business needs.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Business Value",
+    text: "Our success is directly tied to our clients’ success, so every solution is designed to create real business value.",
+  },
+];
 
 const values = [
   {
-    number: "01",
+    icon: HeartHandshake,
     title: "Customer-Centric",
     text: "We focus on understanding each client’s unique needs and building solutions that create real business value.",
   },
   {
-    number: "02",
+    icon: Lightbulb,
     title: "Innovation First",
     text: "We continuously explore new technologies and smarter ways to solve complex business problems.",
   },
   {
-    number: "03",
+    icon: Eye,
     title: "Transparency",
     text: "We keep our clients informed with clear project plans, progress updates, and honest communication.",
   },
   {
-    number: "04",
+    icon: LifeBuoy,
     title: "Long-Term Support",
     text: "We provide ongoing maintenance and support to keep software secure, updated, and performing smoothly.",
   },
@@ -53,632 +99,423 @@ const industries = [
   "Enterprise Software",
 ];
 
-const AboutIcon = ({ type }) => {
-  const cls = "h-7 w-7";
+const stats = [
+  { value: FOUNDED, label: "Founded" },
+  { value: `${yearsOfExperience}+`, label: "Years of experience" },
+  { value: `${partnerCount}+`, label: "Trusted partners" },
+  { value: "100%", label: "Custom solutions" },
+];
 
-  if (type === "team") {
-    return (
-      <svg className={cls} viewBox="0 0 24 24" fill="none">
-        <path
-          d="M16 11a4 4 0 1 0-8 0"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
+const philosophy =
+  "We understand that software development can be complex and time-consuming. That’s why we make the process transparent, collaborative and simple — so you can focus on growing your business.";
 
-        <circle cx="12" cy="7" r="3" stroke="currentColor" strokeWidth="2" />
+const brandGradient = "bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74]";
+const textGradient = `${brandGradient} bg-clip-text text-transparent`;
+const pad = (i) => String(i + 1).padStart(2, "0");
 
-        <path
-          d="M4 21c1.5-4 4.2-6 8-6s6.5 2 8 6"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
+const Eyebrow = ({ children, className = "", center = false }) => (
+  <div className={`inline-flex items-center gap-3 text-sm font-bold uppercase tracking-[0.3em] text-[#a31180] ${className}`}>
+    <span className={`h-0.5 w-10 rounded-full ${brandGradient}`} />
+    {children}
+    {center && <span className={`h-0.5 w-10 rounded-full ${brandGradient}`} />}
+  </div>
+);
 
-  if (type === "code") {
-    return (
-      <svg className={cls} viewBox="0 0 24 24" fill="none">
-        <path
-          d="M8 8 4 12l4 4M16 8l4 4-4 4M14 4l-4 16"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  if (type === "growth") {
-    return (
-      <svg className={cls} viewBox="0 0 24 24" fill="none">
-        <path
-          d="M4 19V5M4 19h16M8 15l3-3 3 2 5-7"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  }
-
-  return (
-    <svg className={cls} viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 2 14.8 8.4 22 9.1l-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.1l7.2-.7L12 2Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-};
-
-const TradeLicenseIcon = () => {
-  return (
-    <svg
-      className="h-7 w-7"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M8 3h8l1 3h3v15H4V6h3l1-3Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-
-      <path
-        d="M8 11h8M8 15h5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-
-      <circle cx="17" cy="17" r="2" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  );
-};
-
-const AboutBackground = () => {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <svg
-        className="absolute inset-0 h-full w-full"
-        viewBox="0 0 1440 1600"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <pattern
-            id="aboutGrid"
-            width="54"
-            height="54"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d="M54 0H0V54"
-              fill="none"
-              stroke="#3b1578"
-              strokeWidth="0.7"
-              opacity="0.07"
-            />
-          </pattern>
-
-          <linearGradient id="aboutGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#3b1578" />
-            <stop offset="50%" stopColor="#a31180" />
-            <stop offset="100%" stopColor="#d10c74" />
-          </linearGradient>
-        </defs>
-
-        <rect width="1440" height="1600" fill="url(#aboutGrid)" />
-
-        <circle cx="120" cy="220" r="280" fill="#3b1578" opacity="0.12" />
-
-        <circle cx="1280" cy="320" r="310" fill="#a31180" opacity="0.12" />
-
-        <circle cx="720" cy="1380" r="360" fill="#d10c74" opacity="0.1" />
-
-        <path
-          className="about-wave"
-          d="M-100 260C190 90 420 410 700 230C980 50 1120 350 1540 150"
-          stroke="url(#aboutGradient)"
-          strokeWidth="2"
-          opacity="0.2"
-        />
-
-        <path
-          className="about-wave"
-          d="M-100 980C170 820 430 1120 730 930C1030 740 1180 1040 1540 860"
-          stroke="url(#aboutGradient)"
-          strokeWidth="2"
-          opacity="0.14"
-        />
-
-        <text
-          className="about-code"
-          x="110"
-          y="740"
-          fill="#3b1578"
-          opacity="0.1"
-          fontSize="100"
-          fontWeight="900"
-        >
-          {"</>"}
-        </text>
-
-        <text
-          className="about-code"
-          x="1180"
-          y="520"
-          fill="#d10c74"
-          opacity="0.1"
-          fontSize="90"
-          fontWeight="900"
-        >
-          {"{}"}
-        </text>
-      </svg>
-
-      <div className="absolute -left-40 top-24 h-96 w-96 rounded-full bg-[#3b1578]/20 blur-3xl" />
-
-      <div className="absolute -right-40 top-44 h-[430px] w-[430px] rounded-full bg-[#a31180]/20 blur-3xl" />
-
-      <div className="absolute bottom-10 left-1/2 h-[460px] w-[460px] -translate-x-1/2 rounded-full bg-[#d10c74]/20 blur-3xl" />
-    </div>
-  );
-};
+// Small rounded photo that sits inline inside the headline
+const InlineImage = ({ src, alt }) => (
+  <span className="ab-capsule relative mx-[0.12em] inline-block h-[0.78em] w-[1.7em] -translate-y-[0.06em] overflow-hidden rounded-full align-middle shadow-[0_10px_30px_-10px_rgba(59,21,120,0.5)] ring-2 ring-white">
+    <img src={src} alt={alt} className="h-full w-full object-cover" />
+  </span>
+);
 
 const AboutUs = () => {
-  const sectionRef = useRef(null);
+  const pageRef = useRef(null);
+  const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".about-reveal",
-        {
-          y: 60,
-          opacity: 0,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.14,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
+  const copyLicense = async () => {
+    try {
+      await navigator.clipboard.writeText(LICENSE_NUMBER);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard can be unavailable (e.g. insecure context); ignore
+    }
+  };
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        // Hero
+        gsap
+          .timeline({ defaults: { ease: "power4.out" } })
+          .from(".ab-hero-line", { yPercent: 110, opacity: 0, duration: 1, stagger: 0.1 })
+          .from(".ab-capsule", { width: 0, duration: 0.9, stagger: 0.15, clearProps: "width" }, 0.5)
+          .from(".ab-hero-fade", { y: 30, opacity: 0, duration: 0.8, stagger: 0.1 }, 0.7);
+
+        // Generic reveals
+        gsap.utils.toArray(".ab-reveal").forEach((el) => {
+          gsap.from(el, {
+            y: 50,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: { trigger: el, start: "top 85%" },
+          });
+        });
+
+        // Collage parallax
+        gsap.utils.toArray("[data-speed]").forEach((el) => {
+          gsap.to(el, {
+            yPercent: Number(el.dataset.speed) * -20,
+            ease: "none",
+            scrollTrigger: { trigger: ".ab-collage", start: "top bottom", end: "bottom top", scrub: true },
+          });
+        });
+
+        // Philosophy: words light up as you scroll
+        gsap.fromTo(
+          ".ab-word",
+          { opacity: 0.12 },
+          {
+            opacity: 1,
+            stagger: 0.05,
+            ease: "none",
+            scrollTrigger: { trigger: ".ab-philosophy", start: "top 75%", end: "bottom 45%", scrub: true },
           },
-        },
-      );
+        );
 
-      gsap.fromTo(
-        ".about-card",
-        {
+        // Values
+        gsap.from(".ab-value", {
           y: 70,
           opacity: 0,
-          scale: 0.95,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.95,
-          stagger: 0.14,
+          rotate: (i) => (i % 2 ? 3 : -3),
+          duration: 1,
+          stagger: 0.12,
           ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".about-card-area",
-            start: "top 78%",
-          },
-        },
-      );
-
-      gsap.fromTo(
-        ".value-card",
-        {
-          y: 60,
-          opacity: 0,
-          rotateX: 12,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          rotateX: 0,
-          duration: 0.9,
-          stagger: 0.14,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".value-area",
-            start: "top 78%",
-          },
-        },
-      );
-
-      gsap.to(".about-wave", {
-        x: 35,
-        duration: 4,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
+          scrollTrigger: { trigger: ".ab-values", start: "top 80%" },
+        });
       });
-
-      gsap.to(".about-code", {
-        y: -18,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        stagger: 0.35,
-        ease: "sine.inOut",
-      });
-
-      gsap.to(".float-img-one", {
-        y: -18,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
-
-      gsap.to(".float-img-two", {
-        y: 16,
-        duration: 3.4,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
+    },
+    { scope: pageRef },
+  );
 
   return (
-    <main
-      ref={sectionRef}
-      className="relative overflow-hidden bg-primary-bg font-arimo"
-    >
-      <AboutBackground />
+    <main ref={pageRef} className="relative overflow-hidden bg-transparent font-arimo text-[#1b0b3a]">
+      {/* ================= HERO ================= */}
+      <section className="container mx-auto px-4 pb-16 pt-16 sm:pt-24">
+        <Eyebrow className="ab-hero-fade">About MerinaSoft</Eyebrow>
 
-      <section className="relative z-10 px-6 pb-20 pt-28 sm:px-10 lg:px-20">
-        <div className="mx-auto max-w-7xl">
+        <h1 className="mt-8 text-[clamp(2.6rem,7.5vw,6.5rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
+          <span className="block overflow-hidden pb-[0.08em]">
+            <span className="ab-hero-line block">
+              We build
+              <InlineImage src={images.team} alt="MerinaSoft team" />
+              software
+            </span>
+          </span>
+          <span className="block overflow-hidden pb-[0.08em]">
+            <span className="ab-hero-line block">
+              that <span className={`${textGradient} italic`}>moves</span>
+              <InlineImage src={images.developer} alt="Developer at work" />
+            </span>
+          </span>
+          <span className="block overflow-hidden pb-[0.08em]">
+            <span className="ab-hero-line block">business forward.</span>
+          </span>
+        </h1>
 
-          <div className="grid items-center gap-12 lg:grid-cols-[0.95fr_1.05fr]">
+        <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
+          <p className="ab-hero-fade max-w-2xl text-base leading-8 text-gray-600 sm:text-lg">
+            We’re a team of dedicated professionals passionate about creating
+            innovative solutions that empower clients to achieve their goals —
+            software that is functional, intuitive and user-friendly.
+          </p>
+          <div className="ab-hero-fade flex flex-wrap gap-4">
+            <Link
+              to="/contact"
+              className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-full ${brandGradient} px-7 py-4 font-bold text-white shadow-[0_10px_40px_-10px_#d10c74] transition-transform duration-300 hover:-translate-y-0.5`}
+            >
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              <span className="relative">Start a Project</span>
+              <ArrowRight className="relative h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+            <Link
+              to="/services"
+              className="inline-flex items-center gap-2 rounded-full border border-[#3b1578]/20 bg-white/60 px-7 py-4 font-bold text-[#3b1578] backdrop-blur transition-all duration-300 hover:border-[#a31180]/40 hover:text-[#a31180]"
+            >
+              Explore Services
+            </Link>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="ab-hero-fade mt-16 grid grid-cols-2 overflow-hidden rounded-[28px] border border-[#3b1578]/10 bg-white/60 backdrop-blur lg:grid-cols-4">
+          {stats.map((s, i) => (
+            <div
+              key={s.label}
+              className={`p-6 sm:p-8 ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b lg:border-b-0" : ""} border-[#3b1578]/10 lg:border-r lg:last:border-r-0`}
+            >
+              <div className={`text-4xl font-semibold leading-none sm:text-5xl ${textGradient}`}>{s.value}</div>
+              <div className="mt-2 text-sm font-semibold text-gray-500">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ================= COLLAGE + PILLARS ================= */}
+      <section className="container mx-auto grid items-center gap-16 px-4 py-20 lg:grid-cols-2">
+        <div className="ab-collage relative h-[520px] sm:h-[600px]">
+          <div data-speed="1" className="absolute left-0 top-0 h-[62%] w-[62%] overflow-hidden rounded-[28px] shadow-[0_40px_80px_-30px_rgba(59,21,120,0.6)]">
+            <img src={images.team} alt="Software team collaboration" loading="lazy" className="h-full w-full object-cover" />
+          </div>
+          <div data-speed="2" className="absolute bottom-0 right-0 h-[58%] w-[58%] overflow-hidden rounded-[28px] border-8 border-(--color-primary-bg) shadow-[0_40px_80px_-30px_rgba(59,21,120,0.6)]">
+            <img src={images.office} alt="Modern software office" loading="lazy" className="h-full w-full object-cover" />
+          </div>
+          <div data-speed="3" className="absolute right-[6%] top-[4%] h-[30%] w-[30%] overflow-hidden rounded-full border-8 border-(--color-primary-bg) shadow-xl">
+            <img src={images.meeting} alt="Team meeting" loading="lazy" className="h-full w-full object-cover" />
+          </div>
+
+          <div data-speed="1.5" className="absolute bottom-[12%] left-[4%] flex items-center gap-3 rounded-2xl border border-[#a31180]/10 bg-(--color-primary-bg)/95 px-4 py-3 shadow-[0_20px_40px_-15px_rgba(59,21,120,0.45)] backdrop-blur">
+            <span className={`flex h-11 w-11 items-center justify-center rounded-xl ${brandGradient} text-white`}>
+              <Sparkles className="h-5 w-5" />
+            </span>
             <div>
-              <div className="about-reveal mb-5 inline-flex items-center gap-3 rounded-full border border-[#a31180]/15 bg-white/80 px-5 py-2 shadow-sm backdrop-blur-md">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#d10c74]" />
-
-                <span className="text-sm font-bold uppercase tracking-[0.25em] text-[#3b1578]">
-                  About MerinaSoft
-                </span>
-              </div>
-
-              <h1 className="about-reveal text-4xl font-black leading-tight text-slate-950 sm:text-5xl lg:text-7xl">
-                We Build Software That{" "}
-                <span className="bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] bg-clip-text text-transparent">
-                  Moves Business Forward
-                </span>
-              </h1>
-
-              <p className="about-reveal mt-7 max-w-2xl text-base font-medium leading-8 text-slate-600 sm:text-lg">
-                Our software company is a team of dedicated professionals
-                passionate about creating innovative solutions that empower
-                clients to achieve their goals. We deliver cutting-edge software
-                that is functional, intuitive, and user-friendly.
-              </p>
-
-              <div className="about-reveal mt-9 flex flex-wrap gap-4">
-                <button
-                  type="button"
-                  className="rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] px-8 py-4 text-sm font-black uppercase tracking-wide text-white shadow-[0_18px_45px_rgba(163,17,128,0.30)] transition-all duration-300 hover:-translate-y-1"
-                >
-                  Start a Project
-                </button>
-
-                <button
-                  type="button"
-                  className="rounded-full border border-[#a31180]/20 bg-white px-8 py-4 text-sm font-black uppercase tracking-wide text-[#3b1578] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-[#3b1578] hover:text-white"
-                >
-                  Explore Services
-                </button>
-              </div>
-            </div>
-
-            <div className="about-reveal relative min-h-[560px]">
-              <div className="absolute inset-0 rounded-[50px] bg-gradient-to-br from-[#3b1578]/20 via-[#a31180]/20 to-[#d10c74]/20 blur-2xl" />
-
-              <div className="relative ml-auto h-[470px] max-w-[520px] overflow-hidden rounded-[46px] border border-white bg-white/70 p-4 shadow-[0_35px_110px_rgba(59,21,120,0.18)] backdrop-blur-xl">
-                <img
-                  src={aboutImages.team}
-                  alt="Software team collaboration"
-                  className="h-full w-full rounded-[34px] object-cover"
-                />
-              </div>
-
-              <div className="float-img-one absolute left-0 top-10 hidden w-[250px] overflow-hidden rounded-[34px] border border-white bg-white p-3 shadow-2xl sm:block">
-                <img
-                  src={aboutImages.developer}
-                  alt="Developer working"
-                  className="h-[170px] w-full rounded-[24px] object-cover"
-                />
-
-                <div className="px-2 py-4">
-                  <p className="text-sm font-black text-slate-950">
-                    Agile Development
-                  </p>
-
-                  <p className="mt-1 text-xs font-semibold text-slate-500">
-                    Transparent workflow
-                  </p>
-                </div>
-              </div>
-
-              <div className="float-img-two absolute bottom-5 right-0 w-[280px] rounded-[34px] border border-white bg-slate-950 p-5 shadow-2xl">
-                <div className="mb-4 flex gap-2">
-                  <span className="h-3 w-3 rounded-full bg-[#d10c74]" />
-                  <span className="h-3 w-3 rounded-full bg-[#a31180]" />
-                  <span className="h-3 w-3 rounded-full bg-white/60" />
-                </div>
-
-                <p className="text-sm leading-7 text-white/75">
-                  <span className="text-[#d10c74]">const</span>{" "}
-                  <span className="text-white">solution</span>{" "}
-                  <span className="text-white/50">=</span>{" "}
-                  <span className="text-[#a31180]">clientNeeds</span>
-                </p>
-
-                <div className="mt-5 rounded-2xl bg-white/10 p-4">
-                  <h4 className="text-3xl font-black text-white">7+</h4>
-
-                  <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-white/50">
-                    Years Experience
-                  </p>
-                </div>
-              </div>
+              <div className="text-sm font-semibold">Agile Development</div>
+              <div className="text-xs font-semibold text-gray-500">Transparent workflow</div>
             </div>
           </div>
 
-          <div className="about-card-area mt-20 grid gap-6 md:grid-cols-3">
-            <div className="about-card rounded-[34px] border border-white bg-white/85 p-7 shadow-[0_25px_80px_rgba(59,21,120,0.08)] backdrop-blur-xl">
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-[#3b1578] text-white shadow-xl">
-                <AboutIcon type="team" />
-              </div>
-
-              <h3 className="text-2xl font-black text-slate-950">
-                Collaborative Team
-              </h3>
-
-              <p className="mt-4 text-base font-medium leading-8 text-slate-600">
-                Our company is built on collaboration and teamwork. We believe
-                the best results come from working together with open
-                communication.
-              </p>
-            </div>
-
-            <div className="about-card rounded-[34px] border border-white bg-white/85 p-7 shadow-[0_25px_80px_rgba(163,17,128,0.08)] backdrop-blur-xl">
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-[#a31180] text-white shadow-xl">
-                <AboutIcon type="code" />
-              </div>
-
-              <h3 className="text-2xl font-black text-slate-950">
-                Smart Software
-              </h3>
-
-              <p className="mt-4 text-base font-medium leading-8 text-slate-600">
-                We create software that is powerful, reliable, user-friendly,
-                and tailored to meet each client’s specific business needs.
-              </p>
-            </div>
-
-            <div className="about-card rounded-[34px] border border-white bg-white/85 p-7 shadow-[0_25px_80px_rgba(209,12,116,0.08)] backdrop-blur-xl">
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-[#d10c74] text-white shadow-xl">
-                <AboutIcon type="growth" />
-              </div>
-
-              <h3 className="text-2xl font-black text-slate-950">
-                Business Value
-              </h3>
-
-              <p className="mt-4 text-base font-medium leading-8 text-slate-600">
-                We believe our success is directly tied to our clients’ success,
-                so every solution is designed to create real business value.
-              </p>
-            </div>
+          <div className="absolute left-[56%] top-[50%] flex h-28 w-28 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-[#1b0b3a] text-white shadow-2xl ring-8 ring-(--color-primary-bg)">
+            <span className="text-3xl font-semibold leading-none">{yearsOfExperience}+</span>
+            <span className="mt-1 text-[10px] font-bold uppercase tracking-widest text-white/60">Years</span>
           </div>
+        </div>
 
-          <div className="mt-20 grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-            <div className="about-card overflow-hidden rounded-[40px] border border-white bg-white/80 p-4 shadow-[0_35px_110px_rgba(59,21,120,0.12)] backdrop-blur-xl">
-              <img
-                src={aboutImages.office}
-                alt="Modern software office"
-                className="h-[420px] w-full rounded-[30px] object-cover"
-              />
-            </div>
+        <div>
+          <Eyebrow className="ab-reveal">Who We Are</Eyebrow>
+          <h2 className="ab-reveal mt-5 text-4xl font-semibold leading-[1.1] tracking-[-0.025em] sm:text-5xl">
+            Built on teamwork, driven by <span className={`${textGradient} italic`}>your success.</span>
+          </h2>
 
-            <div className="about-card rounded-[40px] border border-white bg-white/85 p-8 shadow-[0_30px_100px_rgba(163,17,128,0.10)] backdrop-blur-xl sm:p-10">
-              <span className="mb-5 inline-flex rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] px-5 py-2 text-sm font-black text-white">
-                Our Working Philosophy
-              </span>
-
-              <h2 className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl">
-                Transparent, collaborative, and focused on your goals.
-              </h2>
-
-              <p className="mt-6 text-base font-medium leading-8 text-slate-600">
-                We understand that software development can be complex and
-                time-consuming. That is why we make the process as transparent,
-                collaborative, and simple as possible for our clients.
-              </p>
-
-              <p className="mt-5 text-base font-medium leading-8 text-slate-600">
-                We work closely with clients to understand their specific needs,
-                tailor solutions accordingly, and exceed expectations through
-                reliable delivery.
-              </p>
-
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                {services.map((item, index) => (
-                  <div
-                    key={index}
-                    className="rounded-2xl bg-gradient-to-r from-[#3b1578]/5 via-[#a31180]/5 to-[#d10c74]/5 px-5 py-4 text-sm font-black text-slate-700"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="value-area mt-20">
-            <div className="mx-auto mb-12 max-w-4xl text-center">
-              <h2 className="about-card text-4xl font-black leading-tight text-slate-950 sm:text-5xl">
-                What Makes Us{" "}
-                <span className="bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] bg-clip-text text-transparent">
-                  Different
-                </span>
-              </h2>
-
-              <p className="about-card mx-auto mt-5 max-w-3xl text-base font-medium leading-8 text-slate-600">
-                We combine technical expertise, ethical business practice,
-                strong communication, and client-focused delivery.
-              </p>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-              {values.map((item, index) => (
-                <div
-                  key={index}
-                  className="value-card group rounded-[34px] border border-white bg-white/85 p-7 shadow-[0_25px_80px_rgba(59,21,120,0.08)] backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_35px_100px_rgba(163,17,128,0.16)]"
-                >
-                  <span className="text-5xl font-black text-slate-900/5 transition-all duration-300 group-hover:text-[#d10c74]/15">
-                    {item.number}
-                  </span>
-
-                  <h3 className="mt-4 text-2xl font-black text-slate-950">
-                    {item.title}
-                  </h3>
-
-                  <p className="mt-4 text-sm font-medium leading-7 text-slate-600">
-                    {item.text}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="about-card mt-20 rounded-[40px] bg-slate-950 p-8 shadow-[0_35px_110px_rgba(59,21,120,0.20)] sm:p-10">
-            <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
-              <div>
-                <span className="text-sm font-black uppercase tracking-[0.25em] text-[#d10c74]">
-                  Industries We Serve
-                </span>
-
-                <h2 className="mt-4 text-3xl font-black leading-tight text-white sm:text-4xl">
-                  Experienced across multiple business sectors.
-                </h2>
-
-                <p className="mt-5 text-base font-medium leading-8 text-white/65">
-                  We work with clients from different industries and build
-                  solutions that match their operations, customers, and goals.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                {industries.map((item, index) => (
-                  <span
-                    key={index}
-                    className="rounded-full border border-white/10 bg-white/10 px-5 py-3 text-sm font-black text-white backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-gradient-to-r hover:from-[#3b1578] hover:via-[#a31180] hover:to-[#d10c74]"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="about-card mt-10 overflow-hidden rounded-[40px] border border-white bg-white/85 p-8 shadow-[0_25px_80px_rgba(59,21,120,0.10)] backdrop-blur-xl sm:p-10">
-            <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
-              {/* Left */}
-              <div className="flex items-start gap-5">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br from-[#3b1578] via-[#a31180] to-[#d10c74] text-white shadow-[0_15px_40px_rgba(163,17,128,0.25)]">
-                  <TradeLicenseIcon />
-                </div>
-
-                <div>
-                  <span className="text-xs font-black uppercase tracking-[0.25em] text-[#d10c74]">
-                    Business Registration
-                  </span>
-
-                  <h3 className="mt-2 text-2xl font-black text-slate-950 sm:text-3xl">
-                    Trade License
-                  </h3>
-
-                  <p className="mt-2 max-w-lg text-sm font-medium leading-6 text-slate-500">
-                    Official business trade license information for MerinaSoft.
-                  </p>
-                </div>
-              </div>
-
-              <div className="relative overflow-hidden rounded-[28px] border border-[#a31180]/10 bg-gradient-to-r from-[#3b1578]/5 via-[#a31180]/5 to-[#d10c74]/5 px-6 py-5 sm:px-8">
-                <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#d10c74]/10 blur-xl" />
-
-                <p className="relative text-xs font-black uppercase tracking-[0.18em] text-slate-500">
-                  License Number
-                </p>
-
-                <p className="relative mt-2 break-all text-lg font-black tracking-wide text-[#3b1578] sm:text-xl md:text-2xl">
-                  TRAD/DSCC/325400/2025
-                </p>
-
-                <div className="relative mt-4 flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100">
-                    <svg
-                      className="h-3.5 w-3.5 text-emerald-600"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <path
-                        d="m5 12 4 4L19 6"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-
-                  <span className="text-xs font-bold text-emerald-600">
-                    Registered Business
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="about-card mt-10 overflow-hidden rounded-[40px] bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] p-[1px] shadow-[0_35px_110px_rgba(163,17,128,0.25)]">
-            <div className="rounded-[39px] bg-white px-8 py-12 text-center sm:px-12">
-              <h2 className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl">
-                Looking for a software partner committed to excellence?
-              </h2>
-
-              <p className="mx-auto mt-6 max-w-3xl text-base font-medium leading-8 text-slate-600">
-                We are ready to help you plan, design, develop, launch, and
-                support software solutions that grow with your business.
-              </p>
-
-              <button
-                type="button"
-                className="mt-8 rounded-full bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] px-9 py-4 text-sm font-black uppercase tracking-wide text-white shadow-[0_18px_45px_rgba(163,17,128,0.30)] transition-all duration-300 hover:-translate-y-1"
+          <div className="mt-10 space-y-4">
+            {pillars.map(({ icon: Icon, title, text }, i) => (
+              <div
+                key={title}
+                className="ab-reveal group flex gap-5 rounded-3xl border border-[#3b1578]/10 bg-white/60 p-6 backdrop-blur transition-all duration-500 hover:-translate-y-1 hover:border-transparent hover:bg-white hover:shadow-[0_25px_50px_-25px_rgba(59,21,120,0.45)]"
               >
-                Let&apos;s Build Together
-              </button>
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-fuchsia-50 text-[#a31180] transition-all duration-500 group-hover:bg-gradient-to-br group-hover:from-[#3b1578] group-hover:via-[#a31180] group-hover:to-[#d10c74] group-hover:text-white">
+                  <Icon className="h-6 w-6" />
+                </span>
+                <div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-semibold text-[#d10c74]">{pad(i)}</span>
+                    <h3 className="text-xl font-semibold">{title}</h3>
+                  </div>
+                  <p className="mt-2 leading-7 text-gray-600">{text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= PHILOSOPHY ================= */}
+      <section className="ab-philosophy container mx-auto px-4 py-24 text-center">
+        <Eyebrow center>Our Working Philosophy</Eyebrow>
+        <p className="mx-auto mt-10 max-w-5xl text-[clamp(1.6rem,3.6vw,3.2rem)] font-semibold leading-[1.3] tracking-[-0.02em]">
+          {philosophy.split(" ").map((word, i) => (
+            <span key={i} className="ab-word">
+              {word}{" "}
+            </span>
+          ))}
+        </p>
+        <p className="ab-reveal mx-auto mt-10 max-w-2xl text-base leading-8 text-gray-600 sm:text-lg">
+          We work closely with clients to understand their specific needs, tailor
+          solutions accordingly, and exceed expectations through reliable delivery.
+        </p>
+      </section>
+
+      {/* ================= VALUES ================= */}
+      <section className="ab-values container mx-auto px-4 py-20">
+        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <div>
+            <Eyebrow className="ab-reveal">Our Values</Eyebrow>
+            <h2 className="ab-reveal mt-5 text-4xl font-semibold leading-[1.1] tracking-[-0.025em] sm:text-5xl lg:text-6xl">
+              What makes us <span className={`${textGradient} italic`}>different.</span>
+            </h2>
+          </div>
+          <p className="ab-reveal max-w-md text-base leading-8 text-gray-600 sm:text-lg">
+            Technical expertise, ethical business practice, strong communication
+            and client-focused delivery.
+          </p>
+        </div>
+
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {values.map(({ icon: Icon, title, text }, i) => (
+            <div
+              key={title}
+              className="ab-value group relative min-h-[340px] overflow-hidden rounded-[28px] border border-[#3b1578]/10 bg-white/70 p-7 backdrop-blur"
+            >
+              {/* Gradient fill rising on hover */}
+              <div className={`absolute inset-0 translate-y-full ${brandGradient} transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0`} />
+              <div className="relative flex h-full flex-col">
+                <div className="flex items-start justify-between">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-fuchsia-50 text-[#a31180] transition-colors duration-500 group-hover:bg-white/20 group-hover:text-white">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <span className="text-6xl font-semibold leading-none text-transparent transition-all duration-500 [-webkit-text-stroke:1.5px_rgba(59,21,120,0.15)] group-hover:[-webkit-text-stroke:1.5px_rgba(255,255,255,0.4)]">
+                    {pad(i)}
+                  </span>
+                </div>
+                <h3 className="mt-auto pt-10 text-2xl font-semibold transition-colors duration-500 group-hover:text-white">
+                  {title}
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-gray-600 transition-colors duration-500 group-hover:text-white/85">
+                  {text}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ================= SERVICES & INDUSTRIES ================= */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="ab-reveal relative overflow-hidden rounded-[36px] bg-[#1b0b3a] p-8 text-white sm:p-12 lg:p-16">
+          <div className={`pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full ${brandGradient} opacity-40 blur-3xl`} />
+          <div className="pointer-events-none absolute -bottom-40 -left-20 h-96 w-96 rounded-full bg-[#d10c74] opacity-20 blur-3xl" />
+
+          <div className="relative grid gap-14 lg:grid-cols-2">
+            <div>
+              <span className="text-sm font-bold uppercase tracking-[0.3em] text-[#ff7ac0]">What we do</span>
+              <h2 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">
+                End-to-end software, <br className="hidden sm:block" />
+                from idea to support.
+              </h2>
+              <ul className="mt-8">
+                {services.map((service, i) => (
+                  <li key={service}>
+                    <Link
+                      to="/services"
+                      className="group flex items-center gap-4 border-b border-white/10 py-4 transition-all duration-300 hover:pl-3"
+                    >
+                      <span className="text-xs font-semibold text-white/40">{pad(i)}</span>
+                      <span className="flex-1 text-lg font-bold transition-colors group-hover:text-[#ff7ac0] sm:text-xl">
+                        {service}
+                      </span>
+                      <ArrowUpRight className="h-5 w-5 text-white/30 transition-all duration-300 group-hover:rotate-45 group-hover:text-[#ff7ac0]" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex flex-col">
+              <span className="text-sm font-bold uppercase tracking-[0.3em] text-[#ff7ac0]">Industries we serve</span>
+              <h2 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">
+                Experienced across multiple business sectors.
+              </h2>
+              <p className="mt-5 leading-8 text-white/65">
+                We work with clients from different industries and build solutions
+                that match their operations, customers, and goals.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                {industries.map((industry) => (
+                  <span
+                    key={industry}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-2.5 text-sm font-bold backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-transparent hover:bg-[#a31180]"
+                  >
+                    <CheckCircle2 className="h-4 w-4 text-[#ff7ac0]" />
+                    {industry}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-auto pt-10">
+                <div className="overflow-hidden rounded-3xl">
+                  <img src={img("1522071820081-009f0129c71c", 1200)} alt="MerinaSoft team at work" loading="lazy" className="h-48 w-full object-cover opacity-80 transition-transform duration-700 hover:scale-105" />
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ================= TRADE LICENSE ================= */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="ab-reveal relative mx-auto max-w-4xl overflow-hidden rounded-[32px] bg-gradient-to-br from-[#3b1578] via-[#a31180] to-[#d10c74] p-[2px] shadow-[0_40px_80px_-35px_rgba(163,17,128,0.6)]">
+          <div className="relative overflow-hidden rounded-[30px] bg-(--color-primary-bg) p-8 sm:p-12">
+            {/* Certificate guilloche pattern */}
+            <div
+              className="pointer-events-none absolute inset-0 opacity-[0.06]"
+              style={{
+                backgroundImage:
+                  "repeating-radial-gradient(circle at 100% 0%, #3b1578 0 1px, transparent 1px 14px)",
+              }}
+            />
+            <div className="relative grid items-center gap-10 md:grid-cols-[auto_1fr]">
+              {/* Seal */}
+              <div className="relative mx-auto h-36 w-36">
+                <svg viewBox="0 0 100 100" className="h-full w-full animate-spin-slow [animation-duration:20s] motion-reduce:animate-none">
+                  <defs>
+                    <path id="abSeal" d="M50,50 m-40,0 a40,40 0 1,1 80,0 a40,40 0 1,1 -80,0" />
+                  </defs>
+                  <text fill="#a31180" fontSize="8.5" fontWeight="800" letterSpacing="2.4">
+                    <textPath href="#abSeal">REGISTERED BUSINESS • MERINASOFT • DHAKA •</textPath>
+                  </text>
+                </svg>
+                <div className={`absolute inset-0 m-auto flex h-20 w-20 items-center justify-center rounded-full ${brandGradient} text-white shadow-lg shadow-fuchsia-500/40`}>
+                  <BadgeCheck className="h-10 w-10" />
+                </div>
+              </div>
+
+              <div className="text-center md:text-left">
+                <span className="text-sm font-bold uppercase tracking-[0.3em] text-[#a31180]">Business Registration</span>
+                <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">Trade License</h2>
+                <p className="mt-2 text-gray-500">Official business trade license information for MerinaSoft.</p>
+
+                <div className="mt-6 flex flex-col items-center gap-3 rounded-2xl border border-dashed border-[#a31180]/30 bg-white/70 p-4 sm:flex-row md:items-center">
+                  <div className="flex-1">
+                    <div className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">License Number</div>
+                    <div className="mt-1 break-all font-mono text-lg font-semibold tracking-wide text-[#3b1578] sm:text-xl">
+                      {LICENSE_NUMBER}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={copyLicense}
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#3b1578]/15 bg-white px-4 py-2 text-sm font-bold text-[#3b1578] transition-all duration-300 hover:border-[#a31180]/40 hover:text-[#a31180]"
+                  >
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    {copied ? "Copied" : "Copy"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= CTA ================= */}
+      <section className="container mx-auto px-4 pb-28 pt-10">
+        <div className="ab-reveal text-center">
+          <h2 className="mx-auto max-w-4xl text-[clamp(2rem,5vw,4.5rem)] font-semibold leading-[1.08] tracking-[-0.03em]">
+            Looking for a software partner{" "}
+            <span className={`${textGradient} italic`}>committed to excellence?</span>
+          </h2>
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-gray-600 sm:text-lg">
+            We’re ready to help you plan, design, develop, launch, and support
+            software solutions that grow with your business.
+          </p>
+          <Link
+            to="/contact"
+            className={`group relative mt-10 inline-flex items-center gap-3 overflow-hidden rounded-full ${brandGradient} px-9 py-5 text-lg font-semibold text-white shadow-[0_20px_50px_-12px_#d10c74] transition-transform duration-300 hover:-translate-y-1`}
+          >
+            <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+            <span className="relative">Let’s Build Together</span>
+            <ArrowRight className="relative h-6 w-6 transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
         </div>
       </section>
     </main>

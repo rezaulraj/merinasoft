@@ -11,6 +11,13 @@ import PrivacyPolicy from "./components/common/PrivacyPolicy";
 import RefundPolicy from "./components/common/RefundPolicy";
 import CheckoutPage from "./components/common/CheckoutPage";
 import ProductSection from "./components/common/ProductSection";
+import ClothingPos from "./components/common/ClothingPos";
+import SuperShopPos from "./components/common/SuperShopPos";
+import PharmacyPos from "./components/common/PharmacyPos";
+import CementPos from "./components/common/CementPos";
+import SanitaryPos from "./components/common/SanitaryPos";
+import ECommerce from "./components/common/ECommerce";
+import LmsServices from "./components/common/LmsServices";
 function App() {
   return (
     <>
@@ -27,6 +34,13 @@ function App() {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/clothing-point-of-sale" element={<ClothingPos />} />
+            <Route path="/supershop-point-of-sale" element={<SuperShopPos />} />
+            <Route path="/pharmacy-point-of-sale" element={<PharmacyPos />} />
+            <Route path="/cement-point-of-sale" element={<CementPos />} />
+            <Route path="/sanitary-point-of-sale" element={<SanitaryPos />} />
+            <Route path="/e-commerce" element={<ECommerce />} />
+            <Route path="/lms" element={<LmsServices />} />
             {/* <Route path="/products" element={<ProductSection />} /> */}
           </Route>
         </Routes>

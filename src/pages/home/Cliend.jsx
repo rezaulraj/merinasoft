@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import { ArrowLeft, ArrowRight, Hand, Star } from "lucide-react";
 import cliend from "../../assets/cliend.png";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const testimonials = [
   {
@@ -33,353 +38,333 @@ const testimonials = [
   },
 ];
 
-const FloatingSvg = () => {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <svg
-        className="absolute inset-0 h-full w-full"
-        viewBox="0 0 1440 900"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <pattern
-            id="clientGrid"
-            width="52"
-            height="52"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d="M52 0H0V52"
-              fill="none"
-              stroke="#3b1578"
-              strokeWidth="0.7"
-              opacity="0.08"
-            />
-          </pattern>
+const AUTOPLAY_MS = 6000;
+const SWIPE_THRESHOLD = 100;
 
-          <linearGradient id="clientGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#3b1578" />
-            <stop offset="50%" stopColor="#a31180" />
-            <stop offset="100%" stopColor="#d10c74" />
-          </linearGradient>
-        </defs>
+const brandGradient = "bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74]";
+const textGradient = `${brandGradient} bg-clip-text text-transparent`;
+const pad = (n) => String(n).padStart(2, "0");
+const initials = (name) =>
+  name
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
-        <rect width="1440" height="900" fill="url(#clientGrid)" />
+// Resting position of each card in the deck, by depth (0 = top)
+const deckPose = [
+  "translate(0px, 0px) rotate(0deg) scale(1)",
+  "translate(14px, 22px) rotate(3.5deg) scale(0.95)",
+  "translate(-14px, 44px) rotate(-3.5deg) scale(0.9)",
+  "translate(0px, 60px) rotate(0deg) scale(0.85)",
+];
 
-        <circle cx="120" cy="170" r="240" fill="#3b1578" opacity="0.12" />
-        <circle cx="1280" cy="260" r="270" fill="#a31180" opacity="0.12" />
-        <circle cx="720" cy="820" r="310" fill="#d10c74" opacity="0.1" />
-
-        <path
-          className="client-wave"
-          d="M-100 220C170 80 390 380 650 220C910 60 1120 330 1540 150"
-          stroke="url(#clientGradient)"
-          strokeWidth="2"
-          opacity="0.2"
-        />
-
-        <path
-          className="client-wave"
-          d="M-100 720C190 580 430 840 720 680C1010 520 1160 790 1540 610"
-          stroke="url(#clientGradient)"
-          strokeWidth="2"
-          opacity="0.15"
-        />
-
-        <text
-          className="quote-shape"
-          x="115"
-          y="665"
-          fill="#3b1578"
-          opacity="0.12"
-          fontSize="120"
-          fontWeight="900"
-        >
-          “
-        </text>
-
-        <text
-          className="quote-shape"
-          x="1200"
-          y="320"
-          fill="#d10c74"
-          opacity="0.12"
-          fontSize="120"
-          fontWeight="900"
-        >
-          ”
-        </text>
-      </svg>
-
-      <div className="absolute -left-32 top-20 h-96 w-96 rounded-full bg-[#3b1578]/20 blur-3xl" />
-      <div className="absolute -right-32 top-28 h-[420px] w-[420px] rounded-full bg-[#a31180]/20 blur-3xl" />
-      <div className="absolute bottom-10 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#d10c74]/20 blur-3xl" />
-    </div>
-  );
-};
+const Stars = ({ className = "h-5 w-5" }) => (
+  <div className="flex gap-1">
+    {Array.from({ length: 5 }).map((_, i) => (
+      <Star key={i} className={`${className} fill-[#d10c74] text-[#d10c74]`} />
+    ))}
+  </div>
+);
 
 const Cliend = () => {
   const [active, setActive] = useState(0);
-
+  const [paused, setPaused] = useState(false);
   const sectionRef = useRef(null);
-  const badgeRef = useRef(null);
-  const titleRef = useRef(null);
-  const textBoxRef = useRef(null);
-  const imageRef = useRef(null);
-  const floatingCardRef = useRef(null);
-  const dotsRef = useRef([]);
+  const cardRefs = useRef([]);
+  const drag = useRef({ startX: 0, dx: 0, dragging: false });
+  const animating = useRef(false);
 
+  const n = testimonials.length;
   const current = testimonials[active];
 
+  // Fling the top card off-screen, then send it to the back of the deck
+  const advance = (dir = 1) => {
+    if (animating.current) return;
+    const card = cardRefs.current[active];
+    if (!card) return;
+    animating.current = true;
+
+    gsap.to(card, {
+      x: dir * 520,
+      rotate: dir * 18,
+      opacity: 0,
+      duration: 0.45,
+      ease: "power2.in",
+      onComplete: () => {
+        setActive((prev) => (dir > 0 ? (prev + 1) % n : (prev - 1 + n) % n));
+        gsap.set(card, { x: 0, rotate: 0 });
+        gsap.to(card, { opacity: 1, duration: 0.4, delay: 0.15 });
+        animating.current = false;
+      },
+    });
+  };
+
+  const goTo = (index) => {
+    if (index === active || animating.current) return;
+    setActive(index);
+  };
+
+  // Autoplay
   useEffect(() => {
-    const interval = setInterval(() => {
-      setActive((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
+    if (paused) return;
+    const timer = setTimeout(() => advance(1), AUTOPLAY_MS);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, paused]);
 
-    return () => clearInterval(interval);
-  }, []);
+  // Drag / swipe on the top card
+  const onPointerDown = (e) => {
+    if (animating.current) return;
+    drag.current = { startX: e.clientX, dx: 0, dragging: true };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const onPointerMove = (e) => {
+    if (!drag.current.dragging) return;
+    const dx = e.clientX - drag.current.startX;
+    drag.current.dx = dx;
+    gsap.set(e.currentTarget, { x: dx, rotate: dx / 18 });
+  };
+  const onPointerUp = (e) => {
+    if (!drag.current.dragging) return;
+    drag.current.dragging = false;
+    const { dx } = drag.current;
+    if (Math.abs(dx) > SWIPE_THRESHOLD) {
+      advance(dx > 0 ? 1 : -1);
+    } else {
+      gsap.to(e.currentTarget, { x: 0, rotate: 0, duration: 0.5, ease: "elastic.out(1, 0.6)" });
+    }
+  };
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        [badgeRef.current, titleRef.current],
-        { y: 45, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.15,
-          ease: "power3.out",
-        },
-      );
-
-      gsap.fromTo(
-        imageRef.current,
-        { x: 70, opacity: 0, scale: 0.94 },
-        {
-          x: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 1.2,
-          ease: "power3.out",
-          delay: 0.25,
-        },
-      );
-
-      gsap.to(".client-wave", {
-        x: 35,
-        duration: 4,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
+  // Scroll-in animation
+  useGSAP(
+    () => {
+      gsap.from(".cl-reveal", {
+        y: 40,
+        opacity: 0,
+        duration: 0.9,
+        stagger: 0.12,
+        ease: "power3.out",
+        scrollTrigger: { trigger: sectionRef.current, start: "top 75%" },
       });
-
-      gsap.to(".quote-shape", {
-        y: -18,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        stagger: 0.4,
-        ease: "sine.inOut",
+      gsap.from(".cl-photo", {
+        y: 80,
+        opacity: 0,
+        duration: 1.1,
+        ease: "power3.out",
+        scrollTrigger: { trigger: sectionRef.current, start: "top 70%" },
       });
-
-      gsap.to(".client-float-one", {
-        y: -18,
-        duration: 2.8,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
+      gsap.from(".cl-deck", {
+        rotate: -8,
+        y: 80,
+        opacity: 0,
+        duration: 1.1,
+        ease: "back.out(1.4)",
+        scrollTrigger: { trigger: sectionRef.current, start: "top 70%" },
       });
-
-      gsap.to(".client-float-two", {
-        y: 18,
-        duration: 3.2,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
-
-      gsap.to(".client-float-three", {
-        x: 14,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        textBoxRef.current,
-        { y: 45, opacity: 0, scale: 0.96 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.75,
-          ease: "power3.out",
-        },
-      );
-
-      gsap.fromTo(
-        floatingCardRef.current,
-        { y: 35, opacity: 0, scale: 0.9 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.75,
-          ease: "back.out(1.7)",
-        },
-      );
-
-      gsap.fromTo(
-        dotsRef.current[active],
-        { scale: 0.75 },
-        {
-          scale: 1,
-          duration: 0.35,
-          ease: "back.out(1.7)",
-        },
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, [active]);
+    },
+    { scope: sectionRef },
+  );
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative overflow-hidden bg-primary-bg px-6 py-24 font-arimo sm:px-10 lg:px-20"
-    >
-      <FloatingSvg />
+    <section ref={sectionRef} className="relative overflow-hidden bg-transparent py-24 font-arimo">
+      {/* Giant decorative quote mark */}
+      <div className="pointer-events-none absolute -top-10 right-[-2rem] select-none font-serif text-[22rem] leading-none text-[#a31180]/[0.05]">
+        ”
+      </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="grid items-center gap-12 lg:grid-cols-[0.95fr_1.05fr]">
-          {/* Left Text */}
+      <div className="container relative mx-auto px-4">
+        {/* ---------- Heading ---------- */}
+        <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
           <div>
-            <div
-              ref={badgeRef}
-              className="mb-5 inline-flex items-center gap-3 rounded-full border border-[#a31180]/15 bg-white/80 px-5 py-2 shadow-sm backdrop-blur-md"
-            >
-              <span className="h-2.5 w-2.5 rounded-full bg-[#d10c74]" />
-              <span className="text-sm font-bold uppercase tracking-[0.25em] text-[#3b1578]">
-                Testimonials
-              </span>
+            <div className="cl-reveal inline-flex items-center gap-3 text-sm font-bold uppercase tracking-[0.3em] text-[#a31180]">
+              <span className={`h-0.5 w-10 rounded-full ${brandGradient}`} />
+              Testimonials
             </div>
-
-            <h2
-              ref={titleRef}
-              className="max-w-2xl text-4xl font-black leading-tight text-slate-950 sm:text-5xl lg:text-6xl"
-            >
-              Our Radiant Clients{" "}
-              <span className="bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] bg-clip-text text-transparent">
-                Says Something
-              </span>{" "}
-              About Us
+            <h2 className="cl-reveal mt-5 max-w-3xl text-4xl font-black leading-[1.1] tracking-tight text-[#1b0b3a] sm:text-5xl lg:text-6xl">
+              Loved by the businesses we <span className={`${textGradient} italic`}>build for.</span>
             </h2>
-
-            <div
-              ref={textBoxRef}
-              className="mt-10 rounded-[34px] border border-white bg-white/85 p-7 shadow-[0_30px_90px_rgba(59,21,120,0.10)] backdrop-blur-xl sm:p-9"
-            >
-              <div className="mb-6 flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((item) => (
-                  <span key={item} className="text-xl text-[#d10c74]">
-                    ★
-                  </span>
-                ))}
-              </div>
-
-              <p className="text-base font-medium leading-8 text-slate-600 sm:text-lg">
-                “{current.quote}”
-              </p>
-
-              <div className="mt-8 flex items-center justify-between gap-5">
-                <div>
-                  <h4 className="text-xl font-black text-slate-950">
-                    {current.name}
-                  </h4>
-                  <p className="mt-1 text-sm font-bold text-[#a31180]">
-                    {current.role}
-                  </p>
-                  <p className="text-sm font-medium text-slate-500">
-                    {current.company}
-                  </p>
-                </div>
-
-                <div className="hidden h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-[#3b1578] via-[#a31180] to-[#d10c74] text-4xl font-black text-white shadow-xl sm:flex">
-                  “
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 flex items-center gap-3">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  ref={(el) => (dotsRef.current[index] = el)}
-                  onClick={() => setActive(index)}
-                  className={`h-3 rounded-full transition-all duration-300 ${
-                    active === index
-                      ? "w-10 bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74]"
-                      : "w-3 bg-slate-300 hover:bg-[#a31180]"
-                  }`}
-                />
-              ))}
-            </div>
           </div>
 
-          {/* Right Static Image */}
-          <div ref={imageRef} className="relative">
-            <div className="absolute -inset-5 rounded-[42px] bg-gradient-to-br from-[#3b1578]/20 via-[#a31180]/20 to-[#d10c74]/20 blur-2xl" />
-
-            <div className="relative overflow-hidden rounded-[42px] border border-white bg-white/70 p-5 shadow-[0_35px_110px_rgba(163,17,128,0.18)] backdrop-blur-xl">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,#3b1578_0%,transparent_35%),radial-gradient(circle_at_bottom_right,#d10c74_0%,transparent_35%)] opacity-10" />
-
-              <img
-                src={cliend}
-                alt="MerinaSoft Client"
-                className="relative z-10 mx-auto h-[420px] w-full object-contain sm:h-[520px]"
-              />
-
-              {/* Auto Changing Floating Text */}
-              <div
-                ref={floatingCardRef}
-                className="client-float-one absolute left-5 top-8 z-20 max-w-[260px] rounded-3xl border border-white/40 bg-white/85 p-5 shadow-2xl backdrop-blur-xl"
-              >
-                <p className="line-clamp-3 text-sm font-bold leading-6 text-slate-700">
-                  “{current.quote}”
-                </p>
-                <h5 className="mt-3 text-sm font-black text-[#3b1578]">
-                  - {current.name}
-                </h5>
-              </div>
-
-              <div className="client-float-two absolute bottom-8 right-5 z-20 rounded-3xl border border-white/40 bg-white/85 px-5 py-4 shadow-2xl backdrop-blur-xl">
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
-                  Client Trust
-                </p>
-                <h4 className="mt-1 text-3xl font-black bg-gradient-to-r from-[#3b1578] via-[#a31180] to-[#d10c74] bg-clip-text text-transparent">
-                  100%
-                </h4>
-              </div>
-
-              <div className="client-float-three absolute right-6 top-28 z-20 hidden rounded-3xl border border-white/40 bg-white/85 px-5 py-4 shadow-2xl backdrop-blur-xl md:block">
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
-                  Rating
-                </p>
-                <p className="mt-1 text-lg text-[#d10c74]">★★★★★</p>
-              </div>
+          <div className="cl-reveal flex items-center gap-5 rounded-3xl border border-[#3b1578]/10 bg-white/70 px-6 py-4 backdrop-blur">
+            <div className={`text-5xl font-black leading-none ${textGradient}`}>5.0</div>
+            <div>
+              <Stars className="h-4 w-4" />
+              <p className="mt-1.5 text-sm font-semibold text-gray-500">Average client rating</p>
             </div>
           </div>
         </div>
+
+        <div className="mt-16 grid items-center gap-16 lg:grid-cols-[0.85fr_1.15fr]">
+          {/* ---------- Client photo in arch ---------- */}
+          <div className="cl-photo relative mx-auto w-full max-w-md">
+            <div className="absolute -inset-4 rounded-t-full rounded-b-[40px] border-2 border-dashed border-[#a31180]/25" />
+            <div className={`relative overflow-hidden rounded-t-full rounded-b-[40px] ${brandGradient} p-[3px] shadow-[0_40px_80px_-30px_rgba(163,17,128,0.55)]`}>
+              <div className="relative overflow-hidden rounded-t-full rounded-b-[37px] bg-gradient-to-b from-[#faf4fb] to-(--color-primary-bg)">
+                <div className="absolute left-1/2 top-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-[#a31180]/20 blur-3xl" />
+                <img
+                  src={cliend}
+                  alt="MerinaSoft client"
+                  className="relative mx-auto h-[420px] w-full object-contain object-bottom pt-10 sm:h-[480px]"
+                />
+              </div>
+            </div>
+
+            {/* Trust chip */}
+            <div className="absolute -left-4 bottom-16 rounded-2xl border border-[#a31180]/10 bg-(--color-primary-bg)/95 px-5 py-4 shadow-[0_20px_40px_-15px_rgba(59,21,120,0.4)] backdrop-blur animate-float motion-reduce:animate-none sm:-left-10">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Client Trust</p>
+              <p className={`mt-1 text-3xl font-black ${textGradient}`}>100%</p>
+            </div>
+
+            {/* Rotating badge */}
+            <div className="absolute -right-2 top-10 h-28 w-28 sm:-right-8">
+              <svg viewBox="0 0 100 100" className="h-full w-full animate-spin-slow motion-reduce:animate-none [animation-duration:14s]">
+                <defs>
+                  <path id="clCircle" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" />
+                </defs>
+                <circle cx="50" cy="50" r="48" fill="#1b0b3a" />
+                <text fill="#fff" fontSize="10.5" fontWeight="700" letterSpacing="3">
+                  <textPath href="#clCircle">HAPPY CLIENTS • TRUSTED PARTNER •</textPath>
+                </text>
+              </svg>
+              <div className={`absolute inset-0 m-auto flex h-11 w-11 items-center justify-center rounded-full ${brandGradient} text-xl font-black text-white`}>
+                ”
+              </div>
+            </div>
+          </div>
+
+          {/* ---------- Swipeable card deck ---------- */}
+          <div
+            className="cl-deck"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+          >
+            <div className="relative h-[480px] sm:h-[420px]">
+              {testimonials.map((t, index) => {
+                const depth = (index - active + n) % n;
+                const isTop = depth === 0;
+
+                return (
+                  <div
+                    key={t.name}
+                    className="absolute inset-0 transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                    style={{
+                      transform: deckPose[Math.min(depth, deckPose.length - 1)],
+                      zIndex: n - depth,
+                      opacity: depth > 2 ? 0 : 1,
+                    }}
+                    aria-hidden={!isTop}
+                  >
+                    <div
+                      ref={(el) => (cardRefs.current[index] = el)}
+                      onPointerDown={isTop ? onPointerDown : undefined}
+                      onPointerMove={isTop ? onPointerMove : undefined}
+                      onPointerUp={isTop ? onPointerUp : undefined}
+                      onPointerCancel={isTop ? onPointerUp : undefined}
+                      className={`relative flex h-full touch-pan-y select-none flex-col overflow-hidden rounded-[32px] border p-7 sm:p-10 ${
+                        isTop
+                          ? "cursor-grab border-transparent bg-[#1b0b3a] text-white shadow-[0_40px_80px_-30px_rgba(59,21,120,0.75)] active:cursor-grabbing"
+                          : "border-[#3b1578]/10 bg-white text-[#1b0b3a] shadow-xl"
+                      }`}
+                    >
+                      {isTop && (
+                        <>
+                          <div className={`pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full ${brandGradient} opacity-40 blur-3xl`} />
+                          <div className={`absolute inset-x-0 top-0 h-1 ${brandGradient}`} />
+                        </>
+                      )}
+
+                      <div className="relative flex items-start justify-between">
+                        <Stars />
+                        <span className={`font-serif text-7xl leading-[0.6] ${isTop ? "text-white/15" : "text-[#a31180]/15"}`}>
+                          “
+                        </span>
+                      </div>
+
+                      <p className={`relative mt-6 text-base leading-8 sm:text-lg ${isTop ? "text-white/85" : "text-gray-500"}`}>
+                        {t.quote}
+                      </p>
+
+                      <div className="relative mt-auto flex items-center gap-4 pt-6">
+                        <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${brandGradient} text-lg font-black text-white shadow-lg`}>
+                          {initials(t.name)}
+                        </span>
+                        <div className="min-w-0">
+                          <h4 className="truncate text-lg font-black">{t.name}</h4>
+                          <p className={`truncate text-sm ${isTop ? "text-white/60" : "text-gray-500"}`}>
+                            <span className={isTop ? "font-bold text-[#ff7ac0]" : "font-bold text-[#a31180]"}>{t.role}</span>
+                            {" · "}
+                            {t.company}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Controls */}
+            <div className="mt-20 flex items-center gap-5">
+              <button
+                type="button"
+                onClick={() => advance(-1)}
+                aria-label="Previous testimonial"
+                className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-[#3b1578]/20 text-[#3b1578] transition-all duration-300 hover:border-transparent hover:bg-[#3b1578] hover:text-white"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => advance(1)}
+                aria-label="Next testimonial"
+                className={`flex h-12 w-12 cursor-pointer items-center justify-center rounded-full ${brandGradient} text-white shadow-lg shadow-fuchsia-500/30 transition-transform duration-300 hover:scale-110`}
+              >
+                <ArrowRight className="h-5 w-5" />
+              </button>
+
+              <div className="flex flex-1 items-center gap-2">
+                {testimonials.map((t, index) => (
+                  <button
+                    key={t.name}
+                    type="button"
+                    onClick={() => goTo(index)}
+                    aria-label={`Show testimonial from ${t.name}`}
+                    className="relative h-1.5 flex-1 cursor-pointer overflow-hidden rounded-full bg-[#3b1578]/10"
+                  >
+                    {index === active && (
+                      <span
+                        key={`${active}-${paused}`}
+                        className={`absolute inset-y-0 left-0 rounded-full ${brandGradient}`}
+                        style={{
+                          animation: paused ? "none" : `clProgress ${AUTOPLAY_MS}ms linear forwards`,
+                          width: paused ? "100%" : undefined,
+                        }}
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <span className="text-sm font-bold tabular-nums text-[#1b0b3a]">
+                {pad(active + 1)}
+                <span className="text-gray-400"> / {pad(n)}</span>
+              </span>
+            </div>
+
+            <p className="mt-4 hidden items-center gap-2 text-xs font-semibold text-gray-400 sm:flex">
+              <Hand className="h-4 w-4" /> Drag the card to see the next review
+            </p>
+
+            <span className="sr-only" aria-live="polite">
+              {`Testimonial from ${current.name}, ${current.role} at ${current.company}`}
+            </span>
+          </div>
+        </div>
       </div>
+
+      <style>{`@keyframes clProgress { from { width: 0% } to { width: 100% } }`}</style>
     </section>
   );
 };
